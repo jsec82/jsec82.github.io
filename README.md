@@ -1,11 +1,14 @@
 # Jeroen · Security Engineering Portfolio
 
+**Public website:** https://weijdensecurity.nl/ (verified GitHub Pages custom domain). GitHub Pages still uses the public repository `jsec82/jsec82.github.io`; keep the root `CNAME` file and generated `dist/CNAME` with `weijdensecurity.nl`.
+
 **Version:** V2.0 | **Deployment:** GitHub Pages (public) | **Public identity:** Jeroen
 
 A responsive, evidence-led portfolio site based on the approved dark Microsoft Security dashboard design. It uses a high-impact hero visual, real case summaries and separate recruiter-oriented project pages. All content is curated and reviewed before it is committed to this public repository.
 
 ## What's included
 
+- `CNAME`: GitHub Pages domain mapping (`weijdensecurity.nl`); also generated into `dist/CNAME`.
 - `index.html`: published homepage with globe, focus areas, selected projects, lab timeline and contact; generated from curated content.
 - `projects/*.html`: curated project details with an Evidence Snapshot table.
 - `content/projects.json`: the single human-reviewable list of published cases and statuses.
@@ -49,7 +52,7 @@ The private source repository stays private. The public website uses a separate 
 
 **Publishing is approval-gated:** prepare a sanitized change, run validation, obtain Jeroen's explicit approval for the exact public payload, and only then update this public repository. GitHub Pages currently publishes from `main` after an approved commit. Do not commit unapproved content, even in a draft branch, because this is a public repository.
 
-After content changes, run `python scripts/validate.py`, `python scripts/build.py` and `python scripts/test_links.py`, then commit the reviewed `dist/` output at the repository root (`index.html`, `projects/`, `assets/`, `.nojekyll`, `robots.txt`, `sitemap.xml`). Branch publishing deploys those static files automatically. The manual GitHub Actions deployment workflow is an alternative only after selecting `Settings → Pages → Build and deployment → Source → GitHub Actions`.
+After content changes, run `python scripts/validate.py`, `python scripts/build.py` and `python scripts/test_links.py`, then commit the reviewed `dist/` output at the repository root (`index.html`, `projects/`, `assets/`, `.nojekyll`, `CNAME`, `robots.txt`, `sitemap.xml`). Branch publishing deploys those static files automatically. The manual GitHub Actions deployment workflow is an alternative only after selecting `Settings → Pages → Build and deployment → Source → GitHub Actions`.
 
 The site **does not yet automatically sync** with the private repo. A private-source workflow that prepares publication proposals could be added later if approved; it must not publish private files or raw log data by itself. No content or activity is pulled live from the private repository.
 
@@ -57,6 +60,6 @@ The site **does not yet automatically sync** with the private repo. A private-so
 
 ## Website navigation
 
-The site has dedicated recruiter-oriented routes for [Projects](https://jsec82.github.io/projects/), [Skills](https://jsec82.github.io/skills/), [About](https://jsec82.github.io/about/) and [Lab log](https://jsec82.github.io/activity/). A curated summary remains on the homepage. The build script generates these pages from reviewed public content; project-status filters are an optional client-side enhancement.
+The site has dedicated recruiter-oriented routes for [Projects](https://weijdensecurity.nl/projects/), [Skills](https://weijdensecurity.nl/skills/), [About](https://weijdensecurity.nl/about/) and [Lab log](https://weijdensecurity.nl/activity/). A curated summary remains on the homepage. The build script generates these pages from reviewed public content; project-status filters are an optional client-side enhancement.
 
 Only add public updates after owner approval; the source learning repository remains private.

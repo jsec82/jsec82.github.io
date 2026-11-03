@@ -43,8 +43,8 @@ def footer(nested=False):
 def page(title, markup, nested=False, slug=None, section='overview'):
     up='../' if nested else ''
     public_path=(f'projects/{slug}.html' if nested and slug else (f'{section}/' if nested else ''))
-    canonical='https://jsec82.github.io/'+public_path
-    return f'''<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="dark"><meta name="theme-color" content="#071321"><meta name="description" content="Jeroen's security engineering portfolio: Windows Autopilot, Microsoft Intune, blue-team investigations and documented practical labs."><link rel="canonical" href="{esc(canonical)}"><meta property="og:url" content="{esc(canonical)}"><meta property="og:image" content="https://jsec82.github.io/assets/hero-globe.webp"><meta name="twitter:card" content="summary_large_image"><meta property="og:type" content="website"><meta property="og:title" content="{esc(title)} | Jeroen — Security Engineering"><meta property="og:description" content="Hands-on Microsoft Security and Blue Team labs. What I did, what I verified, and what remains open."><title>{esc(title)} | Jeroen — Security Engineering</title><link rel="icon" type="image/svg+xml" href="{up}assets/favicon.svg"><link rel="stylesheet" href="{up}assets/style.css"></head><body>{header(nested, 'projects' if slug else section)}{markup}{footer(nested)}<script defer src="{up}assets/site.js"></script></body></html>'''
+    canonical='https://weijdensecurity.nl/'+public_path
+    return f'''<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="dark"><meta name="theme-color" content="#071321"><meta name="description" content="Jeroen's security engineering portfolio: Windows Autopilot, Microsoft Intune, blue-team investigations and documented practical labs."><link rel="canonical" href="{esc(canonical)}"><meta property="og:url" content="{esc(canonical)}"><meta property="og:image" content="https://weijdensecurity.nl/assets/hero-globe.webp"><meta name="twitter:card" content="summary_large_image"><meta property="og:type" content="website"><meta property="og:title" content="{esc(title)} | Jeroen — Security Engineering"><meta property="og:description" content="Hands-on Microsoft Security and Blue Team labs. What I did, what I verified, and what remains open."><title>{esc(title)} | Jeroen — Security Engineering</title><link rel="icon" type="image/svg+xml" href="{up}assets/favicon.svg"><link rel="stylesheet" href="{up}assets/style.css"></head><body>{header(nested, 'projects' if slug else section)}{markup}{footer(nested)}<script defer src="{up}assets/site.js"></script></body></html>'''
 
 def focus_card(key,title,desc):
     return f'''<article class="focus-card focus-{key}"><div class="focus-head"><span class="focus-icon">{ICONS[key]}</span><span class="focus-arrow" aria-hidden="true">✦</span></div><h3>{title}</h3><p>{desc}</p></article>'''
@@ -128,9 +128,10 @@ def run():
     for pr in projects:
         (OUT/'projects'/f'{pr["slug"]}.html').write_text(page(pr['title'],detail(pr),nested=True,slug=pr['slug']),encoding='utf-8')
     (OUT/'.nojekyll').write_text('',encoding='utf-8')
-    (OUT/'robots.txt').write_text('User-agent: *\nAllow: /\nSitemap: https://jsec82.github.io/sitemap.xml\n',encoding='utf-8')
+    (OUT/'CNAME').write_text('weijdensecurity.nl',encoding='utf-8')
+    (OUT/'robots.txt').write_text('User-agent: *\nAllow: /\nSitemap: https://weijdensecurity.nl/sitemap.xml\n',encoding='utf-8')
     from xml.sax.saxutils import escape as xml_escape
-    urls=['https://jsec82.github.io/'] + [f'https://jsec82.github.io/{s}/' for s in new_pages] + [f'https://jsec82.github.io/projects/{pr["slug"]}.html' for pr in projects]
+    urls=['https://weijdensecurity.nl/'] + [f'https://weijdensecurity.nl/{s}/' for s in new_pages] + [f'https://weijdensecurity.nl/projects/{pr["slug"]}.html' for pr in projects]
     items=''.join(f'<url><loc>{xml_escape(u)}</loc></url>' for u in urls)
     (OUT/'sitemap.xml').write_text('<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'+items+'</urlset>\n',encoding='utf-8')
     print('Generated:',1+len(new_pages)+len(projects),'pages including 4 dedicated navigation pages')

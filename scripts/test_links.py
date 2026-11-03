@@ -61,6 +61,31 @@ for file, page in pages.items():
         if (root / path).resolve() not in destinations:
             errors.append(f'{file.name}: missing navigation link to {path}')
 
+# Custom-domain regression checks: prevent an old GitHub Pages host on future builds.
+domain = 'https://weijdensecurity.nl'
+for file in pages:
+    source = file.read_text(encoding='utf-8')
+    if 'https://jsec82.github.io/' in source:
+        errors.append(f'{file.name}: old GitHub Pages URL in generated HTML')
+    if f'<link rel="canonical" href="{domain}/' not in source:
+        errors.append(f'{file.name}: custom-domain canonical link missing')
+    if f'<meta property="og:url" content="{domain}/' not in source:
+        errors.append(f'{file.name}: custom-domain Open Graph URL missing')
+    if f'<meta property="og:image" content="{domain}/assets/hero-globe.webp"' not in source:
+        errors.append(f'{file.name}: custom-domain Open Graph image missing')
+cname = root / 'CNAME'
+if not cname.is_file() or cname.read_text(encoding='utf-8').strip() != 'weijdensecurity.nl':
+    errors.append('generated CNAME missing or incorrect')
+robots = root / 'robots.txt'
+if not robots.is_file() or 'Sitemap: https://weijdensecurity.nl/sitemap.xml' not in robots.read_text(encoding='utf-8'):
+    errors.append('generated robots.txt points to the wrong sitemap')
+sitemap = root / 'sitemap.xml'
+if not sitemap.is_file():
+    errors.append('generated sitemap.xml missing')
+else:
+    sitemap_text = sitemap.read_text(encoding='utf-8')
+    if '<loc>https://weijdensecurity.nl/</loc>' not in sitemap_text or 'https://jsec82.github.io/' in sitemap_text:
+        errors.append('generated sitemap.xml points to the wrong host')
 if errors:
     raise SystemExit('SITE LINK CHECK FAILED:\n - ' + '\n - '.join(errors))
 print(f'Internal links, anchors and external URL allowlist passed for {len(pages)} pages.')
