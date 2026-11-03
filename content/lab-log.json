@@ -1,0 +1,23 @@
+[
+  {
+    "date": "2026-11-03",
+    "label": "Entra join, PRT and Intune MDM verified",
+    "detail": "User confirmed AzureAdJoined=YES, AzureAdPrt=YES and managed by Intune; ESP and policy results still open.",
+    "category": "In progress",
+    "project_slug": "md102-autopilot-esp"
+  },
+  {
+    "date": "2026-11-02",
+    "label": "User-driven Autopilot setup started",
+    "detail": "A registered physical Windows device progressed through user-driven setup.",
+    "category": "In progress",
+    "project_slug": "md102-autopilot-esp"
+  },
+  {
+    "date": "2026-10-25",
+    "label": "OhSINT investigation completed",
+    "detail": "Guided 7/7 questions; metadata findings and defensive design documented.",
+    "category": "Completed",
+    "project_slug": "ohsint-investigation"
+  }
+]

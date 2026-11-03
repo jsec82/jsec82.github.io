@@ -1,0 +1,22 @@
+name: Validate portfolio content
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Validate approved content metadata
+        run: python scripts/validate.py
+      - name: Build website for review
+        run: python scripts/build.py
+      - name: Scan output for broken internal page links
+        run: python scripts/test_links.py

@@ -1,0 +1,132 @@
+[
+  {
+    "slug": "ohsint-investigation",
+    "title": "OhSINT Investigation",
+    "eyebrow": "CASE STUDY 001 · OPEN-SOURCE INTELLIGENCE",
+    "status": "completed",
+    "date": "2026-10-25",
+    "discipline": "OSINT / Purple Team",
+    "description": "A guided OSINT investigation into image metadata, public-source correlation and information disclosure risk.",
+    "approach": "Used Windows, PowerShell and ExifTool to inspect a challenge image, identify XMP-exif GPS-related metadata and correlate public information.",
+    "validation": "Completed all seven TryHackMe questions with coaching. A Wi-Fi SSID observation was supplied by the coach and was not independently verified.",
+    "outcome": "Documented investigative limitations and proposed defensive controls for image-publishing workflows. Those controls have not been deployed or tested.",
+    "learned": "Distinguish observed evidence from inference; inspect EXIF and XMP; avoid overstating verification.",
+    "tools": [
+      "Windows",
+      "PowerShell",
+      "ExifTool",
+      "Public OSINT sources"
+    ],
+    "color": "cyan",
+    "priority": 1,
+    "card_approach": "Inspected image metadata and correlated public sources.",
+    "card_validation": "7/7 TryHackMe questions completed with guidance.",
+    "card_outcome": "Documented exposure risks; defensive controls proposed only.",
+    "evidence_checks": [
+      {
+        "item": "Image metadata inspection",
+        "result": "GPS-related fields identified in XMP-exif using ExifTool",
+        "state": "Observed"
+      },
+      {
+        "item": "Challenge completion",
+        "result": "7 of 7 questions completed with coaching",
+        "state": "Completed"
+      },
+      {
+        "item": "Wireless SSID lookup",
+        "result": "Result supplied by coach; not independently confirmed",
+        "state": "Limited"
+      },
+      {
+        "item": "Blue Team controls",
+        "result": "Detection, prevention and verification criteria proposed; not deployed",
+        "state": "Proposed"
+      }
+    ],
+    "example_command": "exiftool -a -G1 -s '-GPS*' '.\\image.jpg'"
+  },
+  {
+    "slug": "md102-autopilot-esp",
+    "title": "Windows Autopilot & Intune enrollment",
+    "eyebrow": "CASE STUDY 002 · ENDPOINT MANAGEMENT",
+    "status": "in-progress",
+    "date": "2026-11-03",
+    "discipline": "Microsoft Intune / Windows Autopilot",
+    "description": "A physical Windows 11 Autopilot lab investigating Microsoft Entra join, user sign-in and Intune management.",
+    "approach": "Inspected Autopilot profile targeting, enrollment restrictions and ESP settings. Completed user-driven Windows setup, signed in with the selected lab account and verified local device trust and MDM indicators.",
+    "validation": "On 3 November 2026, the user observed AzureAdJoined = YES, DomainJoined = NO and AzureAdPrt = YES via dsregcmd. The Windows device appeared in Intune with Managed by = Microsoft Intune. These confirm Entra join, user SSO readiness and Intune MDM visibility. ESP completion has not been established.",
+    "outcome": "Core Microsoft Entra join and Intune MDM enrollment confirmed by user observation. Effective compliance and configuration policy outcomes, application enforcement and actual ESP result remain to be tested.",
+    "learned": "Validate the device trust state, user PRT and MDM status separately. A reachable desktop alone is insufficient; policy application requires additional per-device verification.",
+    "tools": [
+      "Microsoft Intune",
+      "Windows Autopilot",
+      "Microsoft Entra ID",
+      "Windows 11"
+    ],
+    "color": "blue",
+    "priority": 2,
+    "card_approach": "Completed user-driven setup and checked dsregcmd plus the Intune device record.",
+    "card_validation": "Entra join, PRT and Intune MDM confirmed by user checks.",
+    "card_outcome": "ESP outcome and effective device policy status still open.",
+    "evidence_checks": [
+      {
+        "item": "Microsoft Entra join",
+        "result": "AzureAdJoined = YES; DomainJoined = NO",
+        "state": "User-observed"
+      },
+      {
+        "item": "User sign-in / PRT",
+        "result": "AzureAdPrt = YES",
+        "state": "User-observed"
+      },
+      {
+        "item": "Intune MDM enrollment",
+        "result": "Device visible; Managed by = Microsoft Intune",
+        "state": "User-observed"
+      },
+      {
+        "item": "ESP completion",
+        "result": "Outcome not established",
+        "state": "Unverified"
+      },
+      {
+        "item": "Configuration and compliance",
+        "result": "Effective policy results still pending",
+        "state": "Unverified"
+      }
+    ],
+    "example_command": "dsregcmd /status"
+  },
+  {
+    "slug": "identity-detection-roadmap",
+    "title": "Identity & Detection Engineering",
+    "eyebrow": "FUTURE PRACTICE · SECURITY ROADMAP",
+    "status": "roadmap",
+    "date": null,
+    "discipline": "Microsoft Entra ID / Sentinel",
+    "description": "A proposed learning track for identity security, KQL and Microsoft Sentinel detection validation. No completed lab is claimed.",
+    "approach": "Proposed: design controlled identity scenarios and document threat hypotheses and defensive observables.",
+    "validation": "Not started or independently validated as a portfolio case.",
+    "outcome": "Future work will include KQL experiments, validated detection logic and lessons learned when evidence exists.",
+    "learned": "Results will be published only after practical testing and review.",
+    "tools": [
+      "Microsoft Entra ID",
+      "Microsoft Sentinel",
+      "KQL"
+    ],
+    "color": "violet",
+    "priority": 3,
+    "card_approach": "Plan scoped identity scenarios and expected signals.",
+    "card_validation": "Detection tests have not been executed.",
+    "card_outcome": "Publish only after actual lab evidence exists.",
+    "evidence_checks": [
+      {
+        "item": "Microsoft Sentinel detection exercise",
+        "result": "Not started; no detection or query test evidence",
+        "state": "Planned"
+      }
+    ],
+    "example_command": ""
+  }
+]
