@@ -1,12 +1,12 @@
 # Jeroen · Security Engineering Portfolio
 
-**Version:** V2.0 | **Deployment:** not yet published | **Public identity:** Jeroen
+**Version:** V2.0 | **Deployment:** GitHub Pages (public) | **Public identity:** Jeroen
 
-A responsive, evidence-led portfolio site based on the approved dark Microsoft Security dashboard design. It uses a high-impact hero visual, real case summaries and separate recruiter-oriented project pages. All content is intended for review before being committed to a public repository.
+A responsive, evidence-led portfolio site based on the approved dark Microsoft Security dashboard design. It uses a high-impact hero visual, real case summaries and separate recruiter-oriented project pages. All content is curated and reviewed before it is committed to this public repository.
 
 ## What's included
 
-- `index.html`: generated homepage with globe, focus areas, selected projects, lab timeline and contact.
+- `index.html`: published homepage with globe, focus areas, selected projects, lab timeline and contact; generated from curated content.
 - `projects/*.html`: curated project details with an Evidence Snapshot table.
 - `content/projects.json`: the single human-reviewable list of published cases and statuses.
 - `content/lab-log.json`: reviewed activity entries (not a live feed).
@@ -16,7 +16,7 @@ A responsive, evidence-led portfolio site based on the approved dark Microsoft S
 - `scripts/validate.py`: baseline sensitive-information and status validation.
 - `scripts/test_links.py`: static links and anchors checks.
 - `.github/workflows/validate.yml`: tests code changes; does not publish.
-- `.github/workflows/deploy-pages.yml`: manual deployment to GitHub Pages, only after owner's decision.
+- `.github/workflows/deploy-pages.yml`: optional manual GitHub Actions deployment workflow if the Pages source is changed to GitHub Actions. The current Pages configuration uses branch publishing.
 
 ## Current, source-grounded cases
 
@@ -47,8 +47,10 @@ Visual browser verification is documented separately in the private release audi
 
 The private source repository stays private. The public website uses a separate repository `jsec82/jsec82.github.io` and may receive only approved, sanitized content.
 
-Publishing is **manual**: update the reviewed content files, pass tests, obtain Jeroen's approval for the exact public payload **before committing it to a public repository**, and then use `Actions → Publish reviewed portfolio to GitHub Pages → Run workflow`.
+**Publishing is approval-gated:** prepare a sanitized change, run validation, obtain Jeroen's explicit approval for the exact public payload, and only then update this public repository. GitHub Pages currently publishes from `main` after an approved commit. Do not commit unapproved content, even in a draft branch, because this is a public repository.
 
-The site **does not yet automatically sync** with the private repo. A private-source workflow that prepares publication proposals could be added later if approved; it must not publish private files or raw log data by itself. See [Publishing and updates](GITHUB-PAGES-SETUP.md).
+After content changes, run `python scripts/validate.py`, `python scripts/build.py` and `python scripts/test_links.py`, then commit the reviewed `dist/` output at the repository root (`index.html`, `projects/`, `assets/`, `.nojekyll`, `robots.txt`, `sitemap.xml`). Branch publishing deploys those static files automatically. The manual GitHub Actions deployment workflow is an alternative only after selecting `Settings → Pages → Build and deployment → Source → GitHub Actions`.
+
+The site **does not yet automatically sync** with the private repo. A private-source workflow that prepares publication proposals could be added later if approved; it must not publish private files or raw log data by itself. No content or activity is pulled live from the private repository.
 
 © Jeroen. No license is granted for the source or artwork beyond normal viewing of the public website.
