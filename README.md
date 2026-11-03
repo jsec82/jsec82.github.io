@@ -54,3 +54,9 @@ After content changes, run `python scripts/validate.py`, `python scripts/build.p
 The site **does not yet automatically sync** with the private repo. A private-source workflow that prepares publication proposals could be added later if approved; it must not publish private files or raw log data by itself. No content or activity is pulled live from the private repository.
 
 © Jeroen. No license is granted for the source or artwork beyond normal viewing of the public website.
+
+## Website navigation
+
+The site has dedicated recruiter-oriented routes for [Projects](https://jsec82.github.io/projects/), [Skills](https://jsec82.github.io/skills/), [About](https://jsec82.github.io/about/) and [Lab log](https://jsec82.github.io/activity/). A curated summary remains on the homepage. The build script generates these pages from reviewed public content; project-status filters are an optional client-side enhancement.
+
+Only add public updates after owner approval; the source learning repository remains private.

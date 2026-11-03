@@ -45,6 +45,22 @@ for file, page in pages.items():
             errors.append(f'{file.name}: missing local target: {link}')
         elif parsed.fragment and dest in pages and unquote(parsed.fragment) not in pages[dest].ids:
             errors.append(f'{file.name}: missing anchor: {link}')
+# Every page must link to the dedicated navigation destinations, not just homepage anchors.
+required_nav = {'index.html', 'projects/index.html', 'skills/index.html', 'about/index.html', 'activity/index.html'}
+for name in required_nav:
+    if not (root / name).is_file():
+        errors.append(f'missing required navigation page: {name}')
+for file, page in pages.items():
+    destinations = set()
+    for link in page.links:
+        parsed = urlsplit(link)
+        if parsed.scheme or parsed.netloc or not parsed.path:
+            continue
+        destinations.add((file.parent / unquote(parsed.path)).resolve())
+    for path in required_nav:
+        if (root / path).resolve() not in destinations:
+            errors.append(f'{file.name}: missing navigation link to {path}')
+
 if errors:
     raise SystemExit('SITE LINK CHECK FAILED:\n - ' + '\n - '.join(errors))
 print(f'Internal links, anchors and external URL allowlist passed for {len(pages)} pages.')
