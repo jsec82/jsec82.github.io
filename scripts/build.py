@@ -141,10 +141,10 @@ def run():
     (OUT/'index.html').write_text(page('Portfolio',home()),encoding='utf-8')
     new_pages={
       'projects':('Projects & case studies',project_index()),
-      'focus':('Projects by focus area',focus_index()),
       'skills':('Skills & evidence',skills_index()),
       'about':('About Jeroen',about_index()),
       'activity':('Lab log',activity_index()),
+      'focus':('Projects by focus area',focus_index()),
     }
     for section,(title,markup) in new_pages.items():
         (OUT/section/'index.html').write_text(page(title,markup,nested=True,section=section),encoding='utf-8')
