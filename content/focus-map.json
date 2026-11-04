@@ -1,0 +1,20 @@
+{
+  "ohsint-investigation": {
+    "type": "CTF / investigation",
+    "focus_areas": []
+  },
+  "md102-autopilot-esp": {
+    "type": "Hands-on project",
+    "focus_areas": [
+      "intune",
+      "entra"
+    ]
+  },
+  "identity-detection-roadmap": {
+    "type": "Planned learning track",
+    "focus_areas": [
+      "entra",
+      "sentinel"
+    ]
+  }
+}

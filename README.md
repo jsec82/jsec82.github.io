@@ -73,3 +73,12 @@ Only add public updates after owner approval; the source learning repository rem
 - To STOP automatic branch publishing, owner must change Settings → Pages → Source to GitHub Actions. Only then is manual workflow_dispatch the publication path; enter the reviewed main SHA.
 - Owner should configure branch protection and required reviewers for the github-pages environment (where supported). Manual workflow inputs alone do not provide independent approval.
 - Meta CSP cannot enforce frame-ancestors or HSTS; live header/TLS testing remains separate.
+
+## V2.3 — Focus navigation, portrait and clearer illustrations
+
+- Four existing Core Focus Areas cards link to /focus/?area=... to show only reviewed public cases for Intune, Entra, Defender or Sentinel.
+- The existing Featured Projects cards, project content and completed/in-progress/planned status evidence remain unchanged.
+- Three 1600×900 native vector SVG cover illustrations are used as decorative visual aids, never as claimed console screenshots or lab verification.
+- Jeroen's supplied, metadata-stripped, 400×400 WebP portrait appears in the existing homepage About panel and the About page.
+- The existing hero globe is slightly smaller on desktop; the text column is moderately wider.
+- The V2.2 security and publication process stays in place. Only approved public case data appears on focus filters.

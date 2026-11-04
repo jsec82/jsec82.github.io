@@ -86,6 +86,16 @@ else:
     sitemap_text = sitemap.read_text(encoding='utf-8')
     if '<loc>https://weijdensecurity.nl/</loc>' not in sitemap_text or 'https://jsec82.github.io/' in sitemap_text:
         errors.append('generated sitemap.xml points to the wrong host')
+
+# V2.3: all four homepage focus links must target the generated focus catalogue.
+focus_page = root / 'focus' / 'index.html'
+if not focus_page.is_file():
+    errors.append('missing focus-area overview')
+home_source = (root / 'index.html').read_text(encoding='utf-8')
+for area in ('intune', 'entra', 'defender', 'sentinel'):
+    if f'href="focus/index.html?area={area}"' not in home_source:
+        errors.append(f'missing homepage focus link for {area}')
+
 if errors:
     raise SystemExit('SITE LINK CHECK FAILED:\n - ' + '\n - '.join(errors))
 print(f'Internal links, anchors and external URL allowlist passed for {len(pages)} pages.')
