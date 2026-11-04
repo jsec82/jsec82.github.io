@@ -2,7 +2,7 @@
 
 **Public website:** https://weijdensecurity.nl/ (verified GitHub Pages custom domain). GitHub Pages still uses the public repository `jsec82/jsec82.github.io`; keep the root `CNAME` file and generated `dist/CNAME` with `weijdensecurity.nl`.
 
-**Version:** V2.0 | **Deployment:** GitHub Pages (public) | **Public identity:** Jeroen
+**Version:** V2.2 | **Deployment:** GitHub Pages (public) | **Public identity:** Jeroen
 
 A responsive, evidence-led portfolio site based on the approved dark Microsoft Security dashboard design. It uses a high-impact hero visual, real case summaries and separate recruiter-oriented project pages. All content is curated and reviewed before it is committed to this public repository.
 
@@ -63,3 +63,13 @@ The site **does not yet automatically sync** with the private repo. A private-so
 The site has dedicated recruiter-oriented routes for [Projects](https://weijdensecurity.nl/projects/), [Skills](https://weijdensecurity.nl/skills/), [About](https://weijdensecurity.nl/about/) and [Lab log](https://weijdensecurity.nl/activity/). A curated summary remains on the homepage. The build script generates these pages from reviewed public content; project-status filters are an optional client-side enhancement.
 
 Only add public updates after owner approval; the source learning repository remains private.
+
+
+## Security & Reliability V2.2
+
+- Strict meta Content Security Policy with locally hosted scripts/assets only.
+- Security/a11y-baseline lint, image metadata scan, negative unit tests, deterministic release integrity gate.
+- Pinned GitHub Actions SHAs, least-privilege permissions, no persisted checkout credentials.
+- To STOP automatic branch publishing, owner must change Settings → Pages → Source to GitHub Actions. Only then is manual workflow_dispatch the publication path; enter the reviewed main SHA.
+- Owner should configure branch protection and required reviewers for the github-pages environment (where supported). Manual workflow inputs alone do not provide independent approval.
+- Meta CSP cannot enforce frame-ancestors or HSTS; live header/TLS testing remains separate.
