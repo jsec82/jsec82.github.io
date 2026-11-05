@@ -7,6 +7,7 @@ import datetime
 import json
 import re
 import sys
+import xml.etree.ElementTree as ET
 from pathlib import Path
 from urllib.parse import urlsplit
 
@@ -58,9 +59,10 @@ if not isinstance(log, list) or not log:
     errors.append('lab log: expected reviewed events')
 required = {'slug', 'title', 'eyebrow', 'status', 'date', 'discipline',
             'description', 'approach', 'validation', 'outcome', 'learned', 'tools', 'priority',
-            'card_approach', 'card_validation', 'card_outcome'}
+            'card_approach', 'card_validation', 'card_outcome', 'image', 'image_alt', 'visual_label'}
 known_slugs = set()
 priorities = set()
+project_images = set()
 for project in projects:
     slug = project.get('slug', '')
     if not isinstance(slug, str) or not re.fullmatch(r'[a-z0-9-]+', slug):
@@ -72,6 +74,15 @@ for project in projects:
     if missing:
         errors.append(f'{slug}: missing keys {sorted(missing)}')
         continue
+    if not isinstance(project['image'], str) or not re.fullmatch(r'[a-z0-9-]+\.svg', project['image']):
+        errors.append(f'{slug}: image must be a local SVG filename')
+    elif not (ROOT / 'assets' / project['image']).is_file():
+        errors.append(f'{slug}: project image missing')
+    else:
+        project_images.add(project['image'])
+    for field in ('image_alt', 'visual_label'):
+        if not isinstance(project[field], str) or not project[field].strip():
+            errors.append(f'{slug}: {field} missing')
     status = project['status']
     if status not in ('completed', 'in-progress', 'roadmap'):
         errors.append(f'{slug}: invalid status')
@@ -98,6 +109,13 @@ for event in log:
     for field in ('label', 'detail', 'category'):
         if not isinstance(event.get(field), str) or not event[field].strip():
             errors.append(f'lab log: missing {field}')
+for name in project_images:
+    try:
+        root = ET.parse(ROOT / 'assets' / name).getroot()
+        if root.tag != '{http://www.w3.org/2000/svg}svg' or not root.get('viewBox'):
+            errors.append(f'{name}: invalid scalable SVG root')
+    except (ET.ParseError, OSError):
+        errors.append(f'{name}: SVG cannot be parsed')
 # Block high-confidence leaks and URLs that would expose the private repo.
 all_text = '\n'.join((CONTENT / n).read_text(encoding='utf-8') for n in
                      ('site.json', 'projects.json', 'lab-log.json'))

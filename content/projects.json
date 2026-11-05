@@ -1,6 +1,9 @@
 [
   {
     "slug": "ohsint-investigation",
+    "image": "osint-map-hd.svg",
+    "image_alt": "Abstract OSINT map with location markers and investigation connections",
+    "visual_label": "CTF / OSINT",
     "title": "OhSINT Investigation",
     "eyebrow": "CASE STUDY 001 · OPEN-SOURCE INTELLIGENCE",
     "status": "completed",
@@ -48,6 +51,9 @@
   },
   {
     "slug": "md102-autopilot-esp",
+    "image": "windows-art-hd.svg",
+    "image_alt": "Abstract Windows endpoint and cloud management illustration",
+    "visual_label": "ENDPOINT / INTUNE",
     "title": "Windows Autopilot & Intune enrollment",
     "eyebrow": "CASE STUDY 002 · ENDPOINT MANAGEMENT",
     "status": "in-progress",
@@ -100,6 +106,9 @@
   },
   {
     "slug": "identity-detection-roadmap",
+    "image": "detection-art-hd.svg",
+    "image_alt": "Abstract security detection analytics and monitoring illustration",
+    "visual_label": "FUTURE / DETECTION",
     "title": "Identity & Detection Engineering",
     "eyebrow": "FUTURE PRACTICE · SECURITY ROADMAP",
     "status": "roadmap",
@@ -131,6 +140,9 @@
   },
   {
     "slug": "fakebank-attack-defend",
+    "image": "fakebank-art-hd.svg",
+    "image_alt": "Abstract web banking security illustration with vault, shield and transaction paths",
+    "visual_label": "CTF / WEB SECURITY",
     "title": "FakeBank: Attack & Defend",
     "eyebrow": "CTF 002 · WEB SECURITY / PURPLE TEAM",
     "status": "completed",

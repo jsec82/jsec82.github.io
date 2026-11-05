@@ -167,3 +167,24 @@
 }
 @media(max-width:1030px){.about-art.about-art--portrait{margin:12px 0}}
 @media(max-width:720px){.focus-results{grid-template-columns:1fr}.focus-filter-nav{gap:8px}.focus-filter{font-size:12px;padding:9px 11px}}
+
+/* Balanced Dashboard: one image and evidence hierarchy for every project surface. */
+.projects-grid .about-card{grid-column:1/-1}
+.project-visual,.catalog-image{position:relative;overflow:hidden;background:#09233b}
+.project-visual img,.catalog-image img{display:block;width:100%;height:100%;object-fit:cover;object-position:center}
+.project-visual .project-visual-label,.catalog-image .project-visual-label{z-index:2}
+.catalog-image .status{position:absolute;right:13px;top:13px;z-index:2;backdrop-filter:blur(8px)}
+.project-card,.catalog-card{border-color:#2b648e;transition:border-color .2s ease,box-shadow .2s ease,transform .2s ease}
+.project-card:focus-within,.catalog-card:focus-within{border-color:#80ecff}
+.project-card a:focus-visible,.catalog-card a:focus-visible{outline:3px solid #80ecff;outline-offset:3px;border-radius:2px}
+.catalog-kicker{font-size:10px!important;min-height:0!important;text-transform:uppercase;letter-spacing:.08em;font-weight:750;color:#82cfe8!important;margin:0!important}
+.catalog-body h2{margin-top:9px}
+.catalog-body>.text-link{padding-top:12px}
+.detail-hero{padding:0;overflow:hidden}
+.detail-cover{height:230px;position:relative;overflow:hidden;background:#09233b}
+.detail-cover img{display:block;width:100%;height:100%;object-fit:cover}
+.detail-cover:after{content:"";position:absolute;inset:45% 0 0;background:linear-gradient(transparent,#0b2845)}
+.detail-hero-content{padding:24px 35px 30px}
+.focus-results .catalog-card[hidden]{display:none!important}
+@media(max-width:720px){.detail-cover{height:175px}.detail-hero-content{padding:20px 23px 24px}.projects-grid .about-card{grid-column:auto}}
+@media(prefers-reduced-motion:reduce){.catalog-card{transition:none}}

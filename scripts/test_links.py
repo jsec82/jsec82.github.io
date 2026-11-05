@@ -3,6 +3,7 @@
 from html.parser import HTMLParser
 from pathlib import Path
 from urllib.parse import urlsplit, unquote
+import json
 
 root = (Path(__file__).resolve().parents[1] / 'dist').resolve()
 
@@ -60,6 +61,24 @@ for file, page in pages.items():
     for path in required_nav:
         if (root / path).resolve() not in destinations:
             errors.append(f'{file.name}: missing navigation link to {path}')
+
+# Each approved case is reachable from home, catalogue, focus catalogue and activity where relevant.
+projects = json.loads((root.parent / 'content' / 'projects.json').read_text(encoding='utf-8'))
+for project in projects:
+    slug = project['slug']
+    target = (root / 'projects' / f'{slug}.html').resolve()
+    if target not in pages:
+        errors.append(f'{slug}: missing generated detail page')
+        continue
+    for entry in ('index.html', 'projects/index.html', 'focus/index.html'):
+        entry_path = (root / entry).resolve()
+        references = {((entry_path.parent / unquote(urlsplit(href).path)).resolve()) for href in pages[entry_path].links if not urlsplit(href).scheme and urlsplit(href).path}
+        if target not in references:
+            errors.append(f'{slug}: no case link in {entry}')
+    if f'../assets/{project["image"]}' not in pages[target].links:
+        errors.append(f'{slug}: missing detail cover image')
+    if not (root / 'assets' / project['image']).is_file():
+        errors.append(f'{slug}: missing copied illustration')
 
 # Custom-domain regression checks: prevent an old GitHub Pages host on future builds.
 domain = 'https://weijdensecurity.nl'
