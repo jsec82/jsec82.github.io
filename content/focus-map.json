@@ -16,5 +16,9 @@
       "entra",
       "sentinel"
     ]
+  },
+  "fakebank-attack-defend": {
+    "type": "CTF / investigation",
+    "focus_areas": []
   }
 }

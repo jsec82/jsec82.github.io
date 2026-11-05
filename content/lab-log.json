@@ -1,6 +1,13 @@
 [
   {
     "date": "2026-11-03",
+    "label": "FakeBank introductory Purple Team case completed",
+    "detail": "Guided browser and Dirb exercise completed; detection, authorization and validation controls designed but not implemented.",
+    "category": "Completed",
+    "project_slug": "fakebank-attack-defend"
+  },
+  {
+    "date": "2026-11-03",
     "label": "Entra join, PRT and Intune MDM verified",
     "detail": "User confirmed AzureAdJoined=YES, AzureAdPrt=YES and managed by Intune; ESP and policy results still open.",
     "category": "In progress",

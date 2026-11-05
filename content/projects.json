@@ -128,5 +128,56 @@
       }
     ],
     "example_command": ""
+  },
+  {
+    "slug": "fakebank-attack-defend",
+    "title": "FakeBank: Attack & Defend",
+    "eyebrow": "CTF 002 · WEB SECURITY / PURPLE TEAM",
+    "status": "completed",
+    "date": "2026-11-03",
+    "discipline": "Web Security / Purple Team",
+    "description": "A guided TryHackMe investigation connecting web directory enumeration with defensive access control and validation design.",
+    "approach": "Inspected the simulated banking application in Firefox, used Dirb for authorized directory enumeration, discovered a staff-oriented deposit interface and completed the prescribed lab action.",
+    "validation": "TryHackMe accepted the offensive lab answer. Defensive Security Intro was completed previously, as reported by the learner; its individual tasks were not captured here.",
+    "outcome": "Documented the observed lab outcome and proposed defensive logging, server-side authorization and transaction validation controls. No defensive controls were implemented or verified.",
+    "learned": "Unlinked web paths are not security boundaries. Authenticate users, authorize every privileged action server-side, and verify denied transactions against reliable audit records and account balances.",
+    "tools": [
+      "TryHackMe virtual desktop",
+      "Firefox",
+      "Dirb"
+    ],
+    "color": "cyan",
+    "priority": 4,
+    "card_approach": "Inspected FakeBank, enumerated web paths with Dirb and tested the prescribed lab action.",
+    "card_validation": "Offensive answer accepted by TryHackMe; defensive room completion reported by learner.",
+    "card_outcome": "Documented findings; detection, authorization and validation controls proposed only.",
+    "evidence_checks": [
+      {
+        "item": "Web application reconnaissance",
+        "result": "Simulated account overview inspected in Firefox",
+        "state": "Observed"
+      },
+      {
+        "item": "Directory enumeration",
+        "result": "Dirb identified additional reachable web paths",
+        "state": "Observed"
+      },
+      {
+        "item": "Lab completion",
+        "result": "Authorized exercise completed; TryHackMe accepted answer",
+        "state": "Completed"
+      },
+      {
+        "item": "Defensive room",
+        "result": "Completion reported by learner; task-by-task evidence not recorded",
+        "state": "Reported"
+      },
+      {
+        "item": "Security controls",
+        "result": "Logging, server-side authorization and validation proposed, not tested",
+        "state": "Proposed"
+      }
+    ],
+    "example_command": ""
   }
 ]
