@@ -38,6 +38,19 @@ class DashboardTests(unittest.TestCase):
    self.assertIn('Content-Security-Policy',text)
    self.assertIn('https://weijdensecurity.nl/',text)
   for p in ('about/index.html','skills/index.html','activity/index.html'):self.assertTrue((DIST/p).is_file())
+ def test_bilingual_release_and_canonical(self):
+  routes=('index.html','projects/index.html','roadmap/index.html','focus/index.html','contact/index.html')
+  routes+=tuple('projects/'+p['slug']+'.html' for p in self.projects)
+  for rel in routes:
+   for loc in ('', 'en/'):
+    body=(DIST/loc/rel).read_text(encoding='utf-8')
+    self.assertNotIn('noindex',body.lower())
+    self.assertIn('hreflang="nl"',body)
+    self.assertIn('hreflang="en"',body)
+    self.assertIn('Content-Security-Policy',body)
+    self.assertIn('assets/dashboard.js',body)
+  self.assertIn('language-switch',(DIST/'index.html').read_text())
+  self.assertIn('language-switch',(DIST/'en/index.html').read_text())
  def test_high_res_project_images(self):
   for p in self.projects:self.assertTrue((DIST/'assets'/p['image']).is_file())
 if __name__=='__main__':unittest.main()

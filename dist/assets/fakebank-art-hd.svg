@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 540" role="img" aria-labelledby="title desc">
+  <title id="title">FakeBank security investigation</title>
+  <desc id="desc">Stylized secure banking interface with a vault, web routes and detection signals</desc>
+  <defs>
+    <linearGradient id="bg" x2="1" y2="1"><stop stop-color="#061a32"/><stop offset="1" stop-color="#103b5c"/></linearGradient>
+    <linearGradient id="card" x2="1" y2="1"><stop stop-color="#123f61"/><stop offset="1" stop-color="#092740"/></linearGradient>
+    <radialGradient id="glow"><stop stop-color="#15cfde" stop-opacity=".3"/><stop offset="1" stop-color="#15cfde" stop-opacity="0"/></radialGradient>
+    <pattern id="grid" width="36" height="36" patternUnits="userSpaceOnUse"><path d="M36 0H0V36" fill="none" stroke="#51bed9" stroke-opacity=".075"/></pattern>
+  </defs>
+  <rect width="960" height="540" fill="url(#bg)"/>
+  <rect width="960" height="540" fill="url(#grid)"/>
+  <circle cx="635" cy="255" r="290" fill="url(#glow)"/>
+  <g fill="none" stroke="#3fe4e7" stroke-opacity=".35" stroke-width="3">
+    <path d="M85 370h160l76-95h140"/><path d="M620 277h122l92-91h73"/><path d="M620 305h97l78 85h120"/>
+    <circle cx="85" cy="370" r="8" fill="#20d6df"/><circle cx="907" cy="186" r="8" fill="#20d6df"/><circle cx="915" cy="390" r="8" fill="#20d6df"/>
+  </g>
+  <rect x="253" y="102" width="452" height="337" rx="22" fill="#061727" stroke="#358fa9" stroke-width="3"/>
+  <rect x="274" y="122" width="410" height="292" rx="15" fill="url(#card)" stroke="#2d6788"/>
+  <rect x="299" y="145" width="362" height="37" rx="8" fill="#0a2a45"/>
+  <circle cx="322" cy="163" r="5" fill="#63dddf"/><circle cx="341" cy="163" r="5" fill="#367d9c"/><circle cx="360" cy="163" r="5" fill="#367d9c"/>
+  <path d="M433 233l47-22 47 22v51c0 38-26 65-47 75-21-10-47-37-47-75z" fill="#0a3c52" stroke="#60ebeb" stroke-width="5"/>
+  <path d="M462 282l13 13 26-31" fill="none" stroke="#92fff0" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M319 237h76m-76 22h53m-53 22h70m175-44h79m-60 22h60m-79 22h79" stroke="#76b3c8" stroke-opacity=".6" stroke-width="8" stroke-linecap="round"/>
+  <path d="M320 366h85m151 0h87" stroke="#3c879e" stroke-width="7" stroke-linecap="round"/>
+  <g stroke="#66f4eb" fill="#0b3850"><circle cx="235" cy="370" r="16"/><circle cx="742" cy="277" r="16"/><circle cx="795" cy="390" r="16"/></g>
+  <path d="M480 60v45m-9-9 9 9 9-9" fill="none" stroke="#4dd9e2" stroke-width="4" stroke-linecap="round"/>
+</svg>

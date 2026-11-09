@@ -133,7 +133,7 @@ def audit_markup(source, relative):
             errors.append('dangerous or insecure URL scheme in '+tag+'/'+key)
         elif parsed.netloc:
             allowed = value in ALLOWED_OUTBOUND
-            if tag == 'link' and value == page:
+            if tag == 'link' and value.startswith(DOMAIN+'/'):
                 allowed = True
             if not allowed:
                 errors.append('unapproved external URL or resource: '+tag+'/'+key)
