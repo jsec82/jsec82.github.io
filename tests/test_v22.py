@@ -21,10 +21,10 @@ class SecurityAuditTests(unittest.TestCase):
         self.assertEqual([], audit_markup(self.original, Path('index.html')))
 
     def test_external_script_rejected(self):
-        self.check_injection('src="assets/site.js"', 'src="https://cdn.example.com/evil.js"', 'unapproved')
+        self.check_injection('src="assets/dashboard.js"', 'src="https://cdn.example.com/evil.js"', 'unapproved')
 
     def test_inline_event_handler_rejected(self):
-        self.check_injection('<body>', '<body onload="alert(1)">', 'inline event')
+        self.check_injection('<body data-page="home">', '<body data-page="home" onload="alert(1)">', 'inline event')
 
     def test_csp_removal_rejected(self):
         self.check_injection('http-equiv="Content-Security-Policy"', 'name="not-csp"', 'Content Security Policy')
