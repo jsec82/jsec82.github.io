@@ -9,7 +9,7 @@ import sys
 
 ROOT = Path(__file__).resolve().parents[1]
 DIST = ROOT/'dist'
-GENERATED_DIRS = ('assets','projects','about','activity','skills','focus')
+GENERATED_DIRS = ('assets','projects','about','activity','skills','focus','roadmap','contact')
 
 
 def check(root=ROOT):

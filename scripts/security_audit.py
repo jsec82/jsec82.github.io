@@ -50,7 +50,7 @@ class PageInspector(HTMLParser):
     def handle_starttag(self, tag, attrs):
         data = dict(attrs)
         if tag == 'html':
-            self.has_lang = data.get('lang') == 'en'
+            self.has_lang = data.get('lang') in ('en', 'nl')
         if tag == 'title':
             self.title_count += 1
         if tag == 'h1':
@@ -68,7 +68,7 @@ class PageInspector(HTMLParser):
             self.errors.append('unexpected element: '+tag)
         if tag == 'script':
             src = data.get('src', '')
-            if not src or not src.endswith('assets/site.js'):
+            if not src or not src.endswith(('assets/site.js', 'assets/dashboard.js')):
                 self.errors.append('inline/unapproved JavaScript')
         if tag == 'style' or data.get('style'):
             self.errors.append('inline styles prohibited by CSP')
@@ -114,7 +114,7 @@ def audit_markup(source, relative):
     if inspector.h1_count != 1:
         errors.append('page must contain exactly one h1')
     if not inspector.has_lang or not inspector.has_viewport:
-        errors.append('missing English lang or responsive viewport')
+        errors.append('missing valid page language or responsive viewport')
     if inspector.canonical != [page]:
         errors.append('unexpected canonical URL')
     if inspector.og_url != [page]:

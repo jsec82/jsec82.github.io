@@ -1,176 +1,39 @@
 #!/usr/bin/env python3
-"""Generate public-safe, responsive pages from curated content, not private GitHub files."""
-import datetime
-import html
-import json
-import shutil
-import subprocess
-import sys
+"""Build only reviewed public static pages; no network, npm, tenant or private repo access."""
 from pathlib import Path
-
-ROOT = Path(__file__).resolve().parents[1]
-OUT = ROOT / 'dist'
-def esc(value): return html.escape(str(value), quote=True)
-site = json.loads((ROOT/'content/site.json').read_text(encoding='utf-8'))
-projects = sorted(json.loads((ROOT/'content/projects.json').read_text(encoding='utf-8')), key=lambda x:x['priority'])
-updates = sorted(json.loads((ROOT/'content/lab-log.json').read_text(encoding='utf-8')), key=lambda x:x['date'], reverse=True)
-STATUS = {'completed':'Completed', 'in-progress':'In progress', 'roadmap':'Planned'}
-ARROW = '<svg class="arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12h15m-6-6 6 6-6 6"/></svg>'
-GITHUB = '<svg viewBox="0 0 24 24" aria-hidden="true" class="github-svg"><path d="M12 .7a11.3 11.3 0 0 0-3.56 22.04c.56.11.77-.24.77-.55v-2.12c-3.14.68-3.8-1.33-3.8-1.33-.51-1.29-1.25-1.64-1.25-1.64-1.02-.69.08-.68.08-.68 1.14.08 1.74 1.17 1.74 1.17 1 1.73 2.65 1.23 3.29.94.1-.73.4-1.25.72-1.53-2.5-.29-5.14-1.25-5.14-5.63 0-1.25.44-2.27 1.17-3.06-.12-.29-.51-1.45.12-3.01 0 0 .96-.31 3.14 1.17a10.86 10.86 0 0 1 5.71 0c2.18-1.48 3.14-1.17 3.14-1.17.63 1.56.24 2.72.12 3.01.73.79 1.16 1.81 1.16 3.06 0 4.39-2.63 5.34-5.15 5.63.41.36.76 1.04.76 2.09v2.84c0 .31.2.67.78.54A11.3 11.3 0 0 0 12 .7z"/></svg>'
-ICONS = {
- 'intune':'<svg viewBox="0 0 32 32" aria-hidden="true"><rect x="4" y="5" width="24" height="16" rx="1"/><path d="M16 21v6m-7 0h14"/></svg>',
- 'entra':'<svg viewBox="0 0 32 32" aria-hidden="true"><path d="m16 2 14 24-14-4L2 26z" fill="currentColor" stroke="none"/><path d="m16 2-1 20L2 26z" fill="#269bea" stroke="none"/></svg>',
- 'defender':'<svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 2 29 7v9c0 9-7 12-13 14C9 28 3 25 3 16V7z" fill="currentColor" stroke="none"/><path d="M16 7v17M9 16h14" stroke="#072039" stroke-width="2"/></svg>',
- 'sentinel':'<svg viewBox="0 0 32 32" aria-hidden="true"><rect x="3" y="17" width="6" height="12" rx="1"/><rect x="13" y="11" width="6" height="18" rx="1"/><rect x="23" y="4" width="6" height="25" rx="1"/></svg>',
-}
-
-def date_label(d): return datetime.date.fromisoformat(d).strftime('%d %b %Y')
-def pill(status): return f'<span class="status status-{esc(status)}"><i aria-hidden="true"></i>{STATUS[status]}</span>'
-def header(nested=False, active='overview'):
-    up='../' if nested else ''
-    sections = [
-        ('overview', 'Overview', f'{up}index.html'),
-        ('projects', 'Projects', f'{up}projects/index.html'),
-        ('skills', 'Skills', f'{up}skills/index.html'),
-        ('about', 'About', f'{up}about/index.html'),
-        ('activity', 'Lab log', f'{up}activity/index.html'),
-    ]
-    nav=''.join(f'<a href="{href}"'+(' aria-current="page"' if active == key else '')+f'>{title}</a>' for key,title,href in sections)
-    return f'''<a class="skip" href="#main">Skip to content</a><header class="site-header"><div class="shell topbar"><a class="brand" href="{up}index.html" aria-label="Jeroen, homepage"><span class="logo-mark">J<span>⌁</span></span><span>Jeroen<small>Security Engineer</small></span></a><nav id="nav" class="nav" aria-label="Main navigation">{nav}<a class="mobile-contact" target="_blank" rel="noopener noreferrer" href="{esc(site['linkedin_url'])}">Get in touch {ARROW}</a></nav><div class="topbar-actions"><a href="{esc(site['github_profile'])}" class="github-link" rel="noopener noreferrer" target="_blank">{GITHUB} GitHub</a><span class="top-divider"></span><a href="{esc(site['linkedin_url'])}" target="_blank" rel="noopener noreferrer" class="button primary small">Get in touch {ARROW}</a></div><button class="menu-button" type="button" aria-controls="nav" aria-expanded="false" aria-label="Open menu"><span></span><span></span><span></span></button></div></header>'''
-def footer(nested=False):
-    up='../' if nested else ''
-    return f'''<footer class="footer shell"><div><strong>Jeroen <span class="accent">/</span> Security Engineering</strong><p>Practical labs. Verified results. Transparent limitations.</p></div><div class="footer-actions"><a href="{up}projects/index.html">Explore projects</a><a href="{up}skills/index.html">Skills</a><a href="{up}about/index.html">About</a><a href="{esc(site['linkedin_url'])}" target="_blank" rel="noopener noreferrer">LinkedIn</a><a href="{esc(site['github_profile'])}" target="_blank" rel="noopener noreferrer">GitHub</a></div><p class="fineprint">Curated, sanitized case summaries. Original test-tenant details and private lab records are not publicly accessible.</p></footer>'''
-def page(title, markup, nested=False, slug=None, section='overview'):
-    up='../' if nested else ''
-    public_path=(f'projects/{slug}.html' if nested and slug else (f'{section}/' if nested else ''))
-    canonical='https://weijdensecurity.nl/'+public_path
-    return f'''<!doctype html><html lang="en"><head><meta charset="utf-8"><meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'; font-src 'self'; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'; frame-src 'none'"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="dark"><meta name="theme-color" content="#071321"><meta name="description" content="Jeroen's security engineering portfolio: Windows Autopilot, Microsoft Intune, blue-team investigations and documented practical labs."><link rel="canonical" href="{esc(canonical)}"><meta property="og:url" content="{esc(canonical)}"><meta property="og:image" content="https://weijdensecurity.nl/assets/hero-globe.webp"><meta name="twitter:card" content="summary_large_image"><meta property="og:type" content="website"><meta property="og:title" content="{esc(title)} | Jeroen — Security Engineering"><meta property="og:description" content="Hands-on Microsoft Security and Blue Team labs. What I did, what I verified, and what remains open."><title>{esc(title)} | Jeroen — Security Engineering</title><link rel="icon" type="image/svg+xml" href="{up}assets/favicon.svg"><link rel="stylesheet" href="{up}assets/style.css"></head><body>{header(nested, 'projects' if slug or section == 'focus' else section)}{markup}{footer(nested)}<script defer src="{up}assets/site.js"></script></body></html>'''
-
-def focus_card(key,title,desc):
-    return f'''<a class="focus-card focus-{key}" href="focus/index.html?area={esc(key)}" aria-label="View related projects, CTFs and cases for {esc(title)}"><div class="focus-head"><span class="focus-icon">{ICONS[key]}</span><span class="focus-arrow" aria-hidden="true">✦</span></div><h3>{title}</h3><p>{desc}</p></a>'''
-
-def case_card(pr):
-    when=f'<time datetime="{esc(pr["date"])}">{date_label(pr["date"])}</time>' if pr['date'] else 'Future project'
-    return f'''<article class="project-card"><div class="project-visual"><img src="assets/{esc(pr['image'])}" alt="{esc(pr['image_alt'])}" loading="lazy" decoding="async" width="960" height="540"><span class="project-visual-label">{esc(pr['visual_label'])}</span>{pill(pr['status'])}</div><div class="project-body"><div class="project-kicker">{esc(pr['discipline'])} <span>·</span> {when}</div><h3><a href="projects/{esc(pr['slug'])}.html">{esc(pr['title'])}</a></h3><p class="project-desc">{esc(pr['description'])}</p><dl class="proof-list"><div><dt>What I did</dt><dd>{esc(pr['card_approach'])}</dd></div><div><dt>Validation</dt><dd>{esc(pr['card_validation'])}</dd></div><div><dt>Outcome</dt><dd>{esc(pr['card_outcome'])}</dd></div></dl><a class="card-link" href="projects/{esc(pr['slug'])}.html">{'Explore planned scope' if pr['status']=='roadmap' else 'Read case study'} {ARROW}</a></div></article>'''
-
-def activity_panel():
-    li=''.join(f'<li><span class="time-dot" aria-hidden="true"></span><time datetime="{esc(item["date"])}">{date_label(item["date"])}</time><a href="projects/{esc(item["project_slug"])}.html">{esc(item["label"])}</a><p>{esc(item["detail"])}</p></li>' for item in updates[:5])
-    return f'''<aside class="activity-panel panel" id="activity" aria-labelledby="activity-heading"><div class="panel-top"><div class="panel-title"><span class="mini-icon" aria-hidden="true">▤</span><h2 id="activity-heading">Recent lab log</h2></div><span class="review-badge">Reviewed</span></div><ol class="timeline">{li}</ol><p class="panel-foot">Documented updates, not a live feed. <a href="projects/index.html">See projects {ARROW}</a></p></aside>'''
-
-def home():
-    cards = ''.join(case_card(p) for p in projects)
-    latest = max((p for p in projects if p['status'] == 'completed'),
-                 key=lambda p: p['date'], default=None)
-    latest_note = (
-        '<aside class="latest-case" aria-label="Latest completed case">'
-        '<div><p class="eyebrow">LATEST COMPLETED CASE</p>'
-        f'<h3>{esc(latest["title"])}</h3>'
-        f'<p>{esc(latest["description"])}</p></div>'
-        f'<a class="text-link" href="projects/{esc(latest["slug"])}.html">'
-        f'Read the case study {ARROW}</a></aside>'
-    ) if latest else ''
-    return f'''<main id="main"><div class="hero-background"><div class="shell hero-grid"><section class="hero-copy" aria-labelledby="hero-title"><p class="eyebrow hero-overline"><span class="short-line"></span>BUILD <b>·</b> DETECT <b>·</b> INVESTIGATE <b>·</b> IMPROVE</p><h1 id="hero-title">Security<br>Engineering<br><em>Portfolio</em></h1><p class="hero-subtitle">Microsoft Security <span>·</span> Blue Team <span>·</span> Practical Labs</p><p class="hero-description">{esc(site['intro'])}</p><div class="hero-buttons"><a href="projects/index.html" class="button primary">Explore my projects {ARROW}</a><a href="{esc(site['linkedin_url'])}" target="_blank" rel="noopener noreferrer" class="button ghost">Get in touch {ARROW}</a></div><p class="hero-footnote"><span class="tiny-check">✓</span> Evidence-led case studies · No inflated claims</p></section><div class="hero-art"><img src="assets/hero-globe.webp" width="692" height="403" alt="" decoding="async" fetchpriority="high"><span class="art-glow" aria-hidden="true"></span></div>{activity_panel()}</div></div>
-    <div class="shell content-shell"><section class="focus-section" id="skills" aria-labelledby="focus-title"><div class="section-heading"><div class="section-heading-main"><span class="section-icon">◈</span><h2 id="focus-title">Core focus areas</h2><span class="heading-rule" aria-hidden="true"></span></div><p>MY TECHNICAL FOCUS · MICROSOFT SECURITY</p></div><div class="focus-grid">{focus_card('intune','Microsoft Intune','Endpoint management, enrollment and device configuration.')}{focus_card('entra','Microsoft Entra ID','Identity, device trust and access management.')}{focus_card('defender','Microsoft Defender','Endpoint protection and threat investigation as a learning focus.')}{focus_card('sentinel','Microsoft Sentinel','Planned detection engineering and KQL practice.')}</div><a class="text-link section-more" href="skills/index.html">Explore skills and evidence {ARROW}</a></section>
-    <section class="projects-section" id="projects" aria-labelledby="projects-title"><div class="section-heading"><div class="section-heading-main"><span class="section-icon">▱</span><h2 id="projects-title">Featured projects</h2><span class="heading-rule" aria-hidden="true"></span></div><p>THE WORK · THE EVIDENCE · THE LIMITS</p></div><div class="section-intro-line"><p class="section-intro">A curated selection of documented work and future projects. Each case separates hands-on results from proposed controls.</p><a class="text-link" href="projects/index.html">Browse all projects {ARROW}</a></div>{latest_note}<div class="projects-grid">{cards}<aside class="about-card" id="about"><div class="about-heading"><span class="section-icon">♙</span><h2>About Jeroen</h2></div><div class="about-art about-art--portrait"><img src="assets/jeroen-portrait.webp" alt="Portrait of Jeroen" width="112" height="112" decoding="async"></div><p>I am building Microsoft-focused Security Engineering skills through hands-on labs and investigations. I document what worked, what was observed, and what still needs testing.</p><div class="about-divider"></div><h3>How to read my work</h3><div class="legend"><div>{pill('completed')}<span>Exercise completed; limits disclosed</span></div><div>{pill('in-progress')}<span>Work started; checks remain</span></div><div>{pill('roadmap')}<span>Future work, not demonstrated</span></div></div><a class="button ghost about-link" href="about/index.html">Read my story {ARROW}</a></aside></div></section>
-    <section class="workflow-section" aria-labelledby="approach-title"><div><p class="eyebrow">HOW I APPROACH PRACTICAL LABS</p><h2 id="approach-title">From configuration to confirmed results.</h2><p>A professional case study should make it easy to distinguish configuration, observed behaviour and validated outcomes.</p></div><div class="workflow-steps"><span>01 <strong>Objective</strong></span><span>02 <strong>Implementation</strong></span><span>03 <strong>Validation</strong></span><span>04 <strong>Lessons learned</strong></span></div></section></div></main>'''
-
-def detail_item(idx,heading,body):return f'<section class="detail-section"><span class="detail-numeral">{idx}</span><div><h2>{esc(heading)}</h2><p>{esc(body)}</p></div></section>'
-def detail(pr):
-    planned=pr['status']=='roadmap'
-    steps=(detail_item('01','Proposed scope' if planned else 'Approach and tools',pr['approach'])+detail_item('02','Validation to be completed' if planned else 'Evidence and validation',pr['validation'])+detail_item('03','Result and limitations',pr['outcome'])+detail_item('04','Next criteria' if planned else 'Lessons learned',pr['learned']))
-    tools=''.join(f'<span>{esc(t)}</span>' for t in pr['tools'])
-    timestamp=(f'<time datetime="{esc(pr["date"])}">{date_label(pr["date"])}</time>' if pr['date'] else 'Not yet started')
-    checks=''.join(f'<tr><th scope="row">{esc(row["item"])}</th><td>{esc(row["result"])}</td><td><span class="evidence-state">{esc(row["state"])}</span></td></tr>' for row in pr.get('evidence_checks',[]))
-    command=(f'<div class="example-command"><p class="eyebrow">READ-ONLY COMMAND USED IN LAB</p><pre><code>{esc(pr["example_command"])}</code></pre></div>' if pr.get('example_command') else '')
-    evidence_section=(f'<section class="evidence-snapshot"><h2>Evidence snapshot</h2><p>Summarized observations from the documented lab. No private logs or tenant identifiers are included.</p><div class="table-scroll"><table><thead><tr><th scope="col">Check</th><th scope="col">Recorded result</th><th scope="col">Evidence status</th></tr></thead><tbody>{checks}</tbody></table></div>{command}</section>' if checks else '')
-    evidence=('This is a future learning track. No completed lab is claimed.' if planned else 'This case is a curated public summary; private source records are not directly accessible to visitors.')
-    return f'''<main id="main" class="shell detail-page"><a class="back" href="../projects/index.html">← All projects</a><div class="detail-hero"><div class="detail-cover"><img src="../assets/{esc(pr['image'])}" alt="{esc(pr['image_alt'])}" width="960" height="540" decoding="async"></div><div class="detail-hero-content"><p class="eyebrow">{esc(pr['eyebrow'])}</p><div class="detail-hero-heading"><h1>{esc(pr['title'])}</h1>{pill(pr['status'])}</div><p class="detail-summary">{esc(pr['description'])}</p><p class="detail-disclaimer">{evidence}</p></div></div><div class="detail-layout"><div class="detail-main"><h2 class="detail-intro-heading">{'Planned case scope' if planned else 'Case study'}</h2>{evidence_section}{steps}</div><aside class="detail-sidebar"><div class="panel detail-panel"><h2>At a glance</h2><dl class="detail-facts"><div><dt>Status</dt><dd>{pill(pr['status'])}</dd></div><div><dt>Area</dt><dd>{esc(pr['discipline'])}</dd></div><div><dt>Last update</dt><dd>{timestamp}</dd></div></dl></div><div class="panel detail-panel"><h2>Tools & context</h2><div class="toolchips">{tools}</div></div><div class="panel detail-panel"><h2>Evidence boundary</h2><p>Only selected, anonymized project summaries are published here. Screenshots, private tenant identifiers and raw log exports are not shared.</p></div></aside></div><div class="detail-bottom"><a href="../projects/index.html" class="button ghost">Back to projects {ARROW}</a><a href="{esc(site['linkedin_url'])}" class="button primary" target="_blank" rel="noopener noreferrer">Discuss on LinkedIn {ARROW}</a></div></main>'''
-
-def page_intro(key, heading, intro, tag):
-    return f'''<div class="subpage-hero"><div class="shell"><nav class="breadcrumbs" aria-label="Breadcrumb"><a href="../index.html">Overview</a><span aria-hidden="true">/</span><span aria-current="page">{esc(key)}</span></nav><p class="eyebrow">{esc(tag)}</p><h1>{esc(heading)}</h1><p>{esc(intro)}</p></div></div>'''
-
-def catalog_card(pr, prefix='', focus_areas=None):
-    href = f'{prefix}{esc(pr["slug"])}.html'
-    focus_attrs = (f' data-focus-item data-focus-areas="{esc(" ".join(focus_areas))}"' if focus_areas is not None else '')
-    label = 'See planned scope' if pr['status'] == 'roadmap' else 'Read the case study'
-    return f'''<article class="catalog-card" data-project-status="{esc(pr['status'])}"{focus_attrs}><div class="catalog-image"><img src="../assets/{esc(pr['image'])}" alt="{esc(pr['image_alt'])}" width="960" height="540" loading="lazy" decoding="async"><span class="project-visual-label">{esc(pr['visual_label'])}</span>{pill(pr['status'])}</div><div class="catalog-body"><p class="catalog-kicker">{esc(pr['discipline'])}</p><h2><a href="{href}">{esc(pr['title'])}</a></h2><p>{esc(pr['description'])}</p><dl class="catalog-facts"><div><dt>Work</dt><dd>{esc(pr['card_approach'])}</dd></div><div><dt>Evidence</dt><dd>{esc(pr['card_validation'])}</dd></div><div><dt>Result</dt><dd>{esc(pr['card_outcome'])}</dd></div></dl><a class="text-link" href="{href}">{label} {ARROW}</a></div></article>'''
-
-def project_index():
-    # Status filters affect presentation only; without JavaScript every case remains visible.
-    counts={status:sum(p['status']==status for p in projects) for status in STATUS}
-    controls=''.join(f'<button class="filter-button" type="button" data-filter="{status}" aria-pressed="false">{label} <span>{counts[status]}</span></button>' for status,label in (('completed','Completed'),('in-progress','In progress'),('roadmap','Planned')))
-    cards=''.join(catalog_card(p) for p in projects)
-    return f'''<main id="main">{page_intro('Projects','Projects & case studies','Explore practical work in endpoint management and OSINT. Each case shows what was actually performed, what the evidence supports, and what remains open.','THE WORK · THE EVIDENCE · THE OUTCOME')}<div class="shell subpage-body"><div class="summary-strip"><div><strong>{counts['completed']}</strong><span>Completed investigation</span></div><div><strong>{counts['in-progress']}</strong><span>Active hands-on lab</span></div><div><strong>{counts['roadmap']}</strong><span>Future learning track</span></div></div><section aria-labelledby="catalog-heading"><div class="list-heading"><div><p class="eyebrow">PROJECT INDEX</p><h2 id="catalog-heading">Find a project</h2></div><p>Filter by work status. Planned work is never presented as completed experience.</p></div><div class="filter-bar" role="group" aria-label="Filter projects by status"><button class="filter-button is-selected" type="button" data-filter="all" aria-pressed="true">All <span>{len(projects)}</span></button>{controls}</div><div class="catalog-grid" id="project-catalog">{cards}</div><p class="empty-filter" hidden>No matching projects.</p></section><section class="next-path"><div><h2>What comes next?</h2><p>My portfolio grows through documented labs, security cases, and carefully reviewed results. The activity timeline tracks changes already recorded, not a live security feed.</p></div><a href="../activity/index.html" class="button ghost">View lab log {ARROW}</a></section></div></main>'''
-
-def skills_index():
-    skill_cards = [
-      ('01','Microsoft Intune & Autopilot','Hands-on, ongoing','Device enrollment, user-driven Windows Autopilot and MDM management.','User observed device management by Microsoft Intune; effective policy and ESP outcomes still pending.','../projects/md102-autopilot-esp.html','View enrollment evidence'),
-      ('02','Microsoft Entra ID','Hands-on, ongoing','Cloud device identity, sign-in and PRT validation in an authorized test environment.','AzureAdJoined = YES and AzureAdPrt = YES, user-observed on 3 November 2026.','../projects/md102-autopilot-esp.html','View device trust checks'),
-      ('03','OSINT & investigative thinking','Guided case completed','Metadata inspection, corroboration of public clues and risk assessment.','7/7 OhSINT questions with coaching; precise limits of independent verification recorded.','../projects/ohsint-investigation.html','View investigation'),
-      ('04','Microsoft Defender','Learning focus','Endpoint security controls, monitoring and investigation workflows.','Not yet presented as a completed validated Defender case.','../projects/index.html','Browse projects'),
-      ('05','Microsoft Sentinel & KQL','Planned','Detection engineering, query validation and monitoring scenarios.','Practical detection implementation has not yet been demonstrated.','../projects/identity-detection-roadmap.html','View planned track'),
-      ('06','Security automation','Planned','PowerShell, Microsoft Graph and repeatable reporting with least privilege.','No independently verified automation project published yet.','../projects/index.html','View current work'),
-    ]
-    cards=''.join(f'''<article class="skill-proof-card"><span class="skill-index">{num}</span><div class="skill-info"><div class="skill-title"><h2>{esc(title)}</h2><span class="skill-state">{esc(level)}</span></div><p>{esc(desc)}</p><div class="skill-evidence"><strong>Evidence boundary</strong><p>{esc(evidence)}</p></div><a class="text-link" href="{href}">{esc(link)} {ARROW}</a></div></article>''' for num,title,level,desc,evidence,href,link in skill_cards)
-    return f'''<main id="main">{page_intro('Skills','Skills backed by practice','My focus is Microsoft security engineering. This page separates demonstrated activity from areas I am still developing.','TECHNOLOGY · PRACTICE · EVIDENCE')}<div class="shell subpage-body"><div class="subpage-intro"><h2>Experience should be verifiable.</h2><p>These are the tools and disciplines I work with or am learning. A technology listed here is not automatically proof of proficiency. Follow the linked cases to see the recorded checks and limitations.</p></div><section class="skill-grid" aria-label="Skills and supporting evidence">{cards}</section><section class="next-path"><div><h2>Why evidence matters</h2><p>My documentation distinguishes a configured control from a tested outcome. I record remaining gaps rather than declaring a project complete too early.</p></div><a class="button primary" href="../projects/index.html">Explore the case studies {ARROW}</a></section></div></main>'''
-
-def about_index():
-    return f'''<main id="main">{page_intro('About','About Jeroen','Security engineering interests, hands-on methodology, and the reasoning behind this portfolio.','PERSON · APPROACH · DIRECTION')}<div class="shell subpage-body about-layout"><div class="about-main"><section class="editorial-panel"><p class="eyebrow">MY STORY</p><h2>Curious about how security controls work — and whether they actually work.</h2><p>I am developing my Security Engineering skills with an emphasis on the Microsoft ecosystem: device management, identity and access, endpoint security and investigation. I use structured learning, authorized lab environments and case studies to connect concepts to practical results.</p><p>The purpose of this website is straightforward: help a recruiter or engineering manager understand my hands-on development without having to browse a large technical repository. The documentation says what I did, what I observed, and where verification is incomplete.</p></section><section class="editorial-panel"><p class="eyebrow">MY METHOD</p><h2>How I document security engineering work</h2><div class="method-grid"><article><span>01</span><h3>Scope</h3><p>State the security objective and the authorized test environment.</p></article><article><span>02</span><h3>Implement</h3><p>Record the actions and configuration examined or performed.</p></article><article><span>03</span><h3>Verify</h3><p>Separate observed device behaviour from assumptions and planned checks.</p></article><article><span>04</span><h3>Communicate</h3><p>Explain the outcome, unresolved risks and lessons for the next iteration.</p></article></div></section><section class="editorial-panel"><p class="eyebrow">WHERE I AM HEADED</p><h2>Microsoft Security Engineering · Blue Team</h2><p>I am focusing on Microsoft Intune and Entra ID practical labs, and expanding toward vulnerability management, Microsoft Defender, Sentinel, KQL and Purple Team validation. Those later areas are a roadmap, not claims of completed experience.</p><a class="text-link" href="../skills/index.html">See my evidence-mapped skills {ARROW}</a></section></div><aside class="about-side"><div class="profile-panel"><img class="profile-photo" src="../assets/jeroen-portrait.webp" width="104" height="104" alt="Portrait of Jeroen" decoding="async"><h2>Jeroen</h2><p>Security Engineer</p><span class="profile-sep"></span><strong>Focus</strong><p>Microsoft Security · Endpoint & Identity · Blue Team</p><a class="button primary" href="{esc(site['linkedin_url'])}" rel="noopener noreferrer" target="_blank">Connect on LinkedIn {ARROW}</a></div><div class="aside-note"><h3>Portfolio policy</h3><p>Only reviewed, anonymized summaries are published. Raw lab evidence, user details and private tenant settings are not exposed.</p></div></aside></div></main>'''
-
-FOCUS_LABELS = {'all': 'All documented work', 'intune': 'Microsoft Intune', 'entra': 'Microsoft Entra ID', 'defender': 'Microsoft Defender', 'sentinel': 'Microsoft Sentinel'}
-
-def focus_index():
-    mapping = json.loads((ROOT/'content/focus-map.json').read_text(encoding='utf-8'))
-    known = {pr['slug'] for pr in projects}
-    if set(mapping) != known:
-        raise ValueError('focus map must classify each published project, with no unknown slugs')
-    allowed = set(FOCUS_LABELS) - {'all'}
-    for slug, info in mapping.items():
-        if not info.get('type') or not isinstance(info.get('focus_areas'), list) or set(info['focus_areas']) - allowed:
-            raise ValueError(f'Invalid case classification: {slug}')
-    filters = ''.join(f'<a class="focus-filter" href="?area={esc(area)}" data-focus-filter="{esc(area)}">{esc(label if area != "all" else "All work")}</a>' for area,label in FOCUS_LABELS.items())
-    cards = []
-    for pr in projects:
-        info = mapping[pr['slug']]
-        focus = ' '.join(info['focus_areas'])
-        cards.append(catalog_card(pr, prefix='../projects/', focus_areas=info['focus_areas']))
-    main = f'''<main id="main" data-focus-page>{page_intro('Focus areas', 'Explore by focus area', 'Find relevant, reviewed projects, CTFs and cases. Statuses distinguish completed, in-progress and planned work.', 'PROJECTS · CTFS · CASE STUDIES')}<div class="shell subpage-body"><section aria-label="Filter by technical focus"><div class="list-heading"><div><p class="eyebrow">FOCUS FILTER</p><h2 id="focus-selected-title">All documented work</h2></div><p id="focus-count" aria-live="polite">Choose a focus area to narrow results.</p></div><div class="focus-filter-nav">{filters}</div></section><div class="focus-results">{''.join(cards)}</div><div id="focus-empty" class="focus-empty" hidden><h2>No published cases in this area yet.</h2><p>This is a learning focus, not a claim of completed hands-on work. New cases appear only after verification and publication approval.</p><a class="text-link" href="../projects/index.html">Browse all projects {ARROW}</a></div><div class="focus-footer-link"><a class="text-link" href="../projects/index.html">Open the original project overview and status filters {ARROW}</a></div></div></main>'''
-    return main
-
-def activity_index():
-    rows=''.join(f'''<li class="activity-entry"><div class="activity-date"><time datetime="{esc(x['date'])}">{date_label(x['date'])}</time><span class="activity-category">{esc(x['category'])}</span></div><div class="activity-content"><h2><a href="../projects/{esc(x['project_slug'])}.html">{esc(x['label'])}</a></h2><p>{esc(x['detail'])}</p><a class="text-link" href="../projects/{esc(x['project_slug'])}.html">Read related case {ARROW}</a></div></li>''' for x in updates)
-    return f'''<main id="main">{page_intro('Lab log','Lab log & progress','A chronological record of selected hands-on milestones. These are reviewed notes, not an automated activity stream.','DOCUMENTED ACTIVITY · NOT A LIVE FEED')}<div class="shell subpage-body activity-layout"><section><div class="subpage-intro"><h2>Recent documented work</h2><p>Each entry links back to its associated case study and includes the verification boundary where relevant.</p></div><ol class="activity-full-list">{rows}</ol></section><aside class="aside-note activity-aside"><h2>How updates reach this page</h2><p>New lab results are added only after a manual review for accuracy and sensitive information. A commit to the private learning repository does not automatically publish here.</p><a class="text-link" href="../projects/index.html">Browse projects {ARROW}</a></aside></div></main>'''
-
-def run():
+from xml.sax.saxutils import escape
+import shutil, subprocess, sys
+ROOT=Path(__file__).resolve().parents[1]
+OUT=ROOT/'dist'
+SOURCES=ROOT/'site-src/pages'
+LEGACY=('about/index.html','skills/index.html','activity/index.html')
+DOMAIN='https://weijdensecurity.nl'
+def main():
     subprocess.run([sys.executable,str(ROOT/'scripts/validate.py')],check=True)
-    if OUT.is_symlink(): raise SystemExit('dist must not be a symlink')
-    if OUT.exists(): shutil.rmtree(OUT)
-    (OUT/'assets').mkdir(parents=True)
-    for section in ('projects','skills','about','activity','focus'):
-        (OUT/section).mkdir()
-    shared_assets = {'style.css','site.js','favicon.svg','hero-globe.webp','jeroen-portrait.webp',
-                     'osint-map.webp','windows-art.webp','detection-art.webp'}
-    project_assets = {p['image'] for p in projects}
-    for asset in sorted(shared_assets | project_assets):
-        shutil.copyfile(ROOT/'assets'/asset,OUT/'assets'/asset)
-    (OUT/'index.html').write_text(page('Portfolio',home()),encoding='utf-8')
-    new_pages={
-      'projects':('Projects & case studies',project_index()),
-      'skills':('Skills & evidence',skills_index()),
-      'about':('About Jeroen',about_index()),
-      'activity':('Lab log',activity_index()),
-      'focus':('Projects by focus area',focus_index()),
-    }
-    for section,(title,markup) in new_pages.items():
-        (OUT/section/'index.html').write_text(page(title,markup,nested=True,section=section),encoding='utf-8')
-    for pr in projects:
-        (OUT/'projects'/f'{pr["slug"]}.html').write_text(page(pr['title'],detail(pr),nested=True,slug=pr['slug']),encoding='utf-8')
-    (OUT/'.nojekyll').write_text('',encoding='utf-8')
-    (OUT/'CNAME').write_text('weijdensecurity.nl',encoding='utf-8')
-    (OUT/'robots.txt').write_text('User-agent: *\nAllow: /\nSitemap: https://weijdensecurity.nl/sitemap.xml\n',encoding='utf-8')
-    from xml.sax.saxutils import escape as xml_escape
-    urls=['https://weijdensecurity.nl/'] + [f'https://weijdensecurity.nl/{s}/' for s in new_pages] + [f'https://weijdensecurity.nl/projects/{pr["slug"]}.html' for pr in projects]
-    items=''.join(f'<url><loc>{xml_escape(u)}</loc></url>' for u in urls)
-    (OUT/'sitemap.xml').write_text('<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'+items+'</urlset>\n',encoding='utf-8')
-    print('Generated:',1+len(new_pages)+len(projects),'pages including 4 dedicated navigation pages')
-if __name__=='__main__': run()
+    if OUT.is_symlink():raise SystemExit('dist must not be a symlink')
+    if OUT.exists():shutil.rmtree(OUT)
+    OUT.mkdir()
+    shutil.copytree(ROOT/'assets',OUT/'assets')
+    pages=[]
+    for source in sorted(SOURCES.rglob('*.tmpl')):
+        rel=source.relative_to(SOURCES).as_posix().removesuffix('.tmpl')
+        if not rel.endswith('.html') or '..' in Path(rel).parts:raise SystemExit('invalid source path')
+        target=OUT/rel
+        target.parent.mkdir(parents=True,exist_ok=True)
+        shutil.copyfile(source,target)
+        pages.append(rel)
+    for rel in LEGACY:
+        target=OUT/rel
+        target.parent.mkdir(parents=True,exist_ok=True)
+        shutil.copyfile(ROOT/rel,target)
+        pages.append(rel)
+    for name in ('CNAME','robots.txt','.nojekyll'):
+        shutil.copyfile(ROOT/name,OUT/name)
+    def uri(path):
+        if path=='index.html':return DOMAIN+'/'
+        if path.endswith('/index.html'):return DOMAIN+'/'+path.removesuffix('index.html')
+        return DOMAIN+'/'+path
+    rows=''.join('<url><loc>'+escape(uri(p))+'</loc></url>' for p in pages)
+    (OUT/'sitemap.xml').write_text('<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'+rows+'</urlset>\n',encoding='utf-8')
+    print('Generated:',len(pages),'public pages from individually editable source templates.')
+if __name__=='__main__':main()
