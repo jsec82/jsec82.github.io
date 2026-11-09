@@ -31,3 +31,13 @@ python scripts/check_release.py
 python -m unittest discover -s tests -p 'test_*.py' -v
 ```
 Only publish reviewed content. The GitHub Pages branch source may still auto-deploy on a main push; enforce a manual deployment gate separately in repository settings if required.
+
+
+## Bilingual V3.1 release (9 November 2026)
+
+- Dutch homepage remains `/`, English at `/en/`. Nine user-facing routes per language with a contextual language switch.
+- Canonical and hreflang URL pairs, strict CSP, image metadata preflight and source/build integrity checks must pass before publication.
+- Project images reuse existing 1600x900 scalable SVG illustrations, including a dedicated FakeBank cover. This version includes three small, local SVG work-category icons.
+- `scripts/build.py` builds from individual, reviewable templates in `site-src/pages/` and keeps the three legacy routes.
+- Do not treat planned or user-reported outcomes as independently certified. Publication is manual; no data sync to private GitHub.
+- Rollback branch: `rollback/dashboard-v3-before-bilingual-20261109`, reference commit `a4a1964442b0e1f6f815a7fb1fa264b3cd002df3`. To roll back, create a new commit restoring this snapshot instead of force-pushing main.
