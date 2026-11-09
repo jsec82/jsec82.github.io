@@ -33,7 +33,9 @@ class SecurityAuditTests(unittest.TestCase):
         self.check_injection('https://weijdensecurity.nl/', 'https://jsec82.github.io/', 'obsolete')
 
     def test_blank_target_safety(self):
-        self.check_injection('rel="noopener noreferrer"', 'rel="nofollow"', 'noopener/noreferrer')
+        candidate = self.original.replace('</main>', '<a target="_blank" rel="nofollow" href="https://www.linkedin.com/in/jeroenvanderweijden/">LinkedIn</a></main>')
+        errors = audit_markup(candidate, Path('index.html'))
+        self.assertTrue(any('noopener/noreferrer' in e for e in errors), errors)
 
     def test_exif_metadata_rejected(self):
         with tempfile.TemporaryDirectory() as temp:
