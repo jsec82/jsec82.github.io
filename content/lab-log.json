@@ -1,5 +1,19 @@
 [
   {
+    "date": "2026-11-05",
+    "label": "MD-102 LIVE-05: configuration conflicts need diagnosis",
+    "detail": "Learner reported multiple Intune configuration profiles with Conflict; exact setting values and cause not established. No remediation or policy changes performed.",
+    "category": "In progress",
+    "project_slug": "md102-autopilot-esp"
+  },
+  {
+    "date": "2026-11-04",
+    "label": "MD-102 LIVE-04: compliance and profile review",
+    "detail": "Learner reported device Compliant, at least one compliance policy, recent check-in and Test Succeeded. Other configuration results showed Error/Conflict; effective enforcement unverified.",
+    "category": "In progress",
+    "project_slug": "md102-autopilot-esp"
+  },
+  {
     "date": "2026-11-03",
     "label": "FakeBank introductory Purple Team case completed",
     "detail": "Guided browser and Dirb exercise completed; detection, authorization and validation controls designed but not implemented.",
