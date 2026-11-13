@@ -22,6 +22,11 @@ class EngineeringPreview(unittest.TestCase):
    self.assertEqual(home.count('class="group-card"'),3)
    self.assertEqual(hub.count('class="eng-card eng-'),3)
    self.assertIn('projects/engineering/index.html',home)
+ def test_accessible_project_links(self):
+  for prefix in ('','en/'):
+   hub=(DIST/prefix/'projects/engineering/index.html').read_text(encoding='utf-8')
+   self.assertEqual(hub.count('class="eng-card-link"'),3)
+   self.assertEqual(hub.count('aria-label="View planned project:') if prefix else hub.count('aria-label="Bekijk gepland project:'),3)
  def test_explicit_evidence_limits(self):
   for prefix in ('','en/'):
    for slug in ('endpoint','identity','capstone'):

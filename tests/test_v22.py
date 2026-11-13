@@ -65,6 +65,22 @@ class SecurityAuditTests(unittest.TestCase):
                 encoding='utf-8')
             self.assertTrue(any('foreignobject' in e for e in audit(root)))
 
+
+    def test_css_external_import_rejected(self):
+        with tempfile.TemporaryDirectory() as temp:
+            path = Path(temp)/'unsafe.css'
+            for css in ('@import url("https://evil.example/style.css");',
+                        'body{background:url(data:text/html;base64,AAAA)}'):
+                with self.subTest(css=css):
+                    path.write_text(css, encoding='utf-8')
+                    self.assertTrue(any('unsafe CSS' in e for e in scan_asset(path)))
+
+    def test_existing_local_stylesheets_are_safe(self):
+        root = Path(__file__).resolve().parents[1]
+        for path in ('assets/dashboard.css','assets/style.css'):
+            with self.subTest(path=path):
+                self.assertEqual([], scan_asset(root/path))
+
     def test_existing_local_svg_icons_are_safe(self):
         root = Path(__file__).resolve().parents[1]
         for name in ('ctf.svg', 'case.svg', 'lab.svg'):

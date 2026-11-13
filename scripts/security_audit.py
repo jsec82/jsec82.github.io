@@ -187,6 +187,10 @@ def scan_asset(path):
             errors.append('graphic exceeds 500 KB size budget: '+path.name)
         if b'EXIF' in data or b'XMP ' in data:
             errors.append('image contains metadata chunk requiring review: '+path.name)
+    if path.suffix == '.css':
+        source = data.decode('utf-8')
+        if re.search(r'@import\\b|url\\s*\\(\\s*["\\']?(?:https?:|//|data:|javascript:)|expression\\s*\\(', source, re.IGNORECASE):
+            errors.append('unsafe CSS import, remote reference or expression: '+path.name)
     if path.suffix == '.js':
         source = data.decode('utf-8')
         if re.search(r'\b(?:eval|Function)\s*\(', source):
