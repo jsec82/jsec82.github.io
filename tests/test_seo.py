@@ -49,5 +49,5 @@ class SEOTests(unittest.TestCase):
         self.assertIn('User-agent: *\nAllow: /',robots)
         self.assertIn('Sitemap: https://weijdensecurity.nl/sitemap.xml',robots)
         root=ET.parse(DIST/'sitemap.xml').getroot()
-        self.assertEqual(len(root),29)
+        self.assertEqual(len(root),31)
 if __name__=='__main__':unittest.main()

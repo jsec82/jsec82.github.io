@@ -15,6 +15,11 @@ ROOT = Path(__file__).resolve().parents[1]
 DIST = ROOT / 'dist'
 DOMAIN = 'https://weijdensecurity.nl'
 ALLOWED_OUTBOUND = {
+    'https://www.nist.gov/publications/workforce-framework-cybersecurity-nice-framework',
+    'https://www.nist.gov/itl/applied-cybersecurity/nice/nice-framework-resource-center/nice-framework-current-versions',
+    'https://www.nist.gov/cyberframework',
+    'https://learn.microsoft.com/en-us/security/zero-trust/zero-trust-overview',
+    'https://attack.mitre.org/resources/',
     'https://github.com/jsec82',
     'https://www.linkedin.com/in/jeroenvanderweijden/',
 }

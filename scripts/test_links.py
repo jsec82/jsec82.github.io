@@ -23,7 +23,7 @@ for file,p in pages.items():
     for raw in p.links:
         u=urlsplit(raw)
         if u.scheme or u.netloc:
-            if not (u.scheme=='https' and (u.netloc=='weijdensecurity.nl' or raw in ('https://github.com/jsec82','https://www.linkedin.com/in/jeroenvanderweijden/'))):
+            if not (u.scheme=='https' and (u.netloc=='weijdensecurity.nl' or raw in ('https://github.com/jsec82','https://www.linkedin.com/in/jeroenvanderweijden/','https://www.nist.gov/publications/workforce-framework-cybersecurity-nice-framework','https://www.nist.gov/itl/applied-cybersecurity/nice/nice-framework-resource-center/nice-framework-current-versions','https://www.nist.gov/cyberframework','https://learn.microsoft.com/en-us/security/zero-trust/zero-trust-overview','https://attack.mitre.org/resources/'))):
                 errors.append(f'{file}: unapproved external url {raw}')
             continue
         target=(file.parent/unquote(u.path)).resolve() if u.path else file
@@ -35,6 +35,7 @@ projects=json.loads((ROOT/'content/projects.json').read_text(encoding='utf-8'))
 required|={'projects/'+p['slug']+'.html' for p in projects}
 required|={'en/'+rel for rel in required if rel not in ('about/index.html','skills/index.html','activity/index.html')}
 required|={prefix+'projects/engineering/'+route for prefix in ('','en/') for route in ('index.html','endpoint.html','identity.html','capstone.html')}
+required|={'methodology/index.html','en/methodology/index.html'}
 for rel in required:
     if (DIST/rel).resolve() not in pages:errors.append('missing route: '+rel)
 if len(pages)!=len(required):errors.append('Unexpected HTML count')

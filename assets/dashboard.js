@@ -7,3 +7,14 @@ const focus=document.querySelector('#focus-list');if(focus){const allowed=['all'
 const miles=[...document.querySelectorAll('.mile[data-track]')];if(miles.length){document.querySelectorAll('[data-track-filter]').forEach(b=>b.addEventListener('click',()=>{const v=b.dataset.trackFilter;document.querySelectorAll('[data-track-filter]').forEach(x=>x.setAttribute('aria-pressed',String(x===b)));miles.forEach(m=>m.hidden=v!=='all'&&m.dataset.track!==v)}))}
 for(const a of document.querySelectorAll('[data-language-switch]')){a.addEventListener('click',e=>{const u=new URL(a.href,location.href);const p=new URLSearchParams(location.search);if(p.has('group'))u.searchParams.set('group',p.get('group'));if(p.has('area'))u.searchParams.set('area',p.get('area'));if(location.hash)u.hash=location.hash;e.preventDefault();location.assign(u.href)})}
 })();
+/* Persist an explicit visitor theme choice across NL/EN routes without tracking or requests. */
+(()=>{'use strict';
+const root=document.documentElement,key='weijden-security-theme';
+let chosen='dark';try{const saved=localStorage.getItem(key);if(saved==='dark'||saved==='light')chosen=saved}catch(_){}
+const set=(value,persist)=>{if(value!=='dark'&&value!=='light')return;root.dataset.theme=value;
+document.querySelectorAll('[data-theme-select]').forEach(button=>button.setAttribute('aria-pressed',String(button.dataset.themeSelect===value)));
+const meta=document.querySelector('meta[name="theme-color"]');if(meta)meta.setAttribute('content',value==='light'?'#f4f8fc':'#0c192b');
+if(persist){try{localStorage.setItem(key,value)}catch(_){}}};
+set(chosen,false);
+document.querySelectorAll('[data-theme-select]').forEach(button=>button.addEventListener('click',()=>set(button.dataset.themeSelect,true)));
+})();
