@@ -1,5 +1,6 @@
 """Bilingual security engineering preview regression checks."""
 from pathlib import Path
+from html.parser import HTMLParser
 import unittest
 ROOT=Path(__file__).resolve().parents[1]
 DIST=ROOT/'dist'
@@ -27,4 +28,26 @@ class EngineeringPreview(unittest.TestCase):
     html=(DIST/prefix/'projects/engineering'/f'{slug}.html').read_text(encoding='utf-8')
     self.assertIn('eng-detail-status',html)
     self.assertIn('eng-checks',html)
+
+ def test_localized_switch_targets_actual_counterpart(self):
+  class SwitchParser(HTMLParser):
+   def __init__(self):
+    super().__init__(); self.switches={}
+   def handle_starttag(self,tag,attrs):
+    if tag=='a':
+     item=dict(attrs)
+     if item.get('data-language-switch') in ('nl','en'):
+      self.switches[item['data-language-switch']]=item.get('href')
+  for slug in ('index.html','endpoint.html','identity.html','capstone.html'):
+   for prefix in ('','en/'):
+    file=DIST/prefix/'projects/engineering'/slug
+    parser=SwitchParser()
+    parser.feed(file.read_text(encoding='utf-8'))
+    self.assertEqual(set(parser.switches), {'nl','en'})
+    for language,href in parser.switches.items():
+     target=(file.parent/href).resolve()
+     expected=(DIST/('en/' if language=='en' else '')/'projects/engineering'/slug).resolve()
+     self.assertEqual(target,expected)
+     self.assertTrue(target.is_file())
+
 if __name__=='__main__': unittest.main()

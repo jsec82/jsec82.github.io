@@ -37,6 +37,40 @@ class SecurityAuditTests(unittest.TestCase):
         errors = audit_markup(candidate, Path('index.html'))
         self.assertTrue(any('noopener/noreferrer' in e for e in errors), errors)
 
+
+    def test_svg_active_content_rejected(self):
+        cases = [
+            '<svg xmlns="http://www.w3.org/2000/svg" onload="alert(1)"/>',
+            '<svg xmlns="http://www.w3.org/2000/svg"><script>alert(1)</script></svg>',
+            '<svg xmlns="http://www.w3.org/2000/svg"><image href="https://evil.example/img.png"/></svg>',
+            '<!DOCTYPE svg [<!ENTITY xxe SYSTEM "file:///etc/passwd">]><svg xmlns="http://www.w3.org/2000/svg"/>',
+        ]
+        with tempfile.TemporaryDirectory() as temp:
+            bad = Path(temp)/'unsafe.svg'
+            for payload in cases:
+                with self.subTest(payload=payload[:65]):
+                    bad.write_text(payload, encoding='utf-8')
+                    self.assertTrue(scan_asset(bad), 'Unsafe SVG accepted')
+
+    def test_nested_svg_asset_scanned(self):
+        from scripts.security_audit import audit
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            icons = root/'assets'/'icons'
+            icons.mkdir(parents=True)
+            (root/'CNAME').write_text('weijdensecurity.nl', encoding='utf-8')
+            (root/'index.html').write_text('x', encoding='utf-8')
+            (icons/'unsafe.svg').write_text(
+                '<svg xmlns="http://www.w3.org/2000/svg"><foreignObject/></svg>',
+                encoding='utf-8')
+            self.assertTrue(any('foreignobject' in e for e in audit(root)))
+
+    def test_existing_local_svg_icons_are_safe(self):
+        root = Path(__file__).resolve().parents[1]
+        for name in ('ctf.svg', 'case.svg', 'lab.svg'):
+            with self.subTest(name=name):
+                self.assertEqual([], scan_asset(root/'assets'/'icons'/name))
+
     def test_exif_metadata_rejected(self):
         with tempfile.TemporaryDirectory() as temp:
             file=Path(temp)/'example.webp'
