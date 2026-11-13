@@ -21,6 +21,14 @@ The homepage presents a clear learning journey, four Microsoft Core Focus Areas,
 - Sanitized project outputs keep user-reported observations and unresolved Intune/ESP limitations explicit.
 - Static automated security validation is not a penetration test or substitute for live HTTPS/header checks.
 
+
+## Hands-on Engineering preview and security review — 13 November 2026
+
+- The bilingual [Hands-on Security Engineering project section](./site-src/pages/projects/engineering/index.html.tmpl) is prepared **only on a review branch** with three planned flagships, dedicated NL/EN detail pages and homepage/Projects/Roadmap navigation.
+- The [security and release assessment](./SECURITY-REVIEW-2026-11-13.md) records verified static controls, added SVG/CSS negative tests, repository bytecode cleanup and unresolved hosting requirements.
+- **Do not merge this PR into main without separate publication authorization and a verified Pages publishing source.** History shows GitHub Pages builds following pushes to main. The manually triggered deployment workflow does not, by itself, prevent that.
+- The current preview is **not a live feature**, and passing CI is not a claim of fully verified TLS/headers, accessibility or vulnerability-free operation.
+
 ## Local tests
 ```bash
 python scripts/validate.py

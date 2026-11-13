@@ -9,6 +9,7 @@ from pathlib import Path
 from urllib.parse import urlsplit
 import re
 import sys
+import xml.etree.ElementTree as ET
 
 ROOT = Path(__file__).resolve().parents[1]
 DIST = ROOT / 'dist'
@@ -142,14 +143,54 @@ def audit_markup(source, relative):
     return errors
 
 
+
+def scan_svg(path, data):
+    """Block active SVG features and external references, including nested icons."""
+    errors = []
+    if len(data) > 250_000:
+        errors.append('SVG exceeds 250 KB size budget: '+path.name)
+    if re.search(rb'<!DOCTYPE|<!ENTITY|<\?xml-stylesheet', data, re.IGNORECASE):
+        errors.append('SVG contains DTD, entity, or XML stylesheet: '+path.name)
+        return errors
+    try:
+        root = ET.fromstring(data)
+    except ET.ParseError:
+        errors.append('SVG is not well-formed XML: '+path.name)
+        return errors
+    if root.tag != '{http://www.w3.org/2000/svg}svg':
+        errors.append('SVG root is not SVG namespace: '+path.name)
+    forbidden = {'script', 'foreignobject', 'image', 'feimage', 'a', 'audio',
+                 'video', 'iframe', 'animate', 'animatetransform',
+                 'animatemotion', 'set', 'style'}
+    for element in root.iter():
+        tag = element.tag.rsplit('}', 1)[-1].lower()
+        if tag in forbidden:
+            errors.append('SVG active/external element prohibited: '+tag+' in '+path.name)
+        for raw_name, value in element.attrib.items():
+            name = raw_name.rsplit('}', 1)[-1].lower()
+            if name.startswith('on') and len(name) > 2:
+                errors.append('SVG inline event prohibited: '+name+' in '+path.name)
+            if name in ('href', 'src'):
+                errors.append('SVG link or remote reference prohibited: '+name+' in '+path.name)
+            if re.search(r'url\(\s*["\']?(?:https?:|//|data:|javascript:)|@import|expression\s*\(', value, re.IGNORECASE):
+                errors.append('SVG unsafe URL or style expression: '+path.name)
+    return errors
+
+
 def scan_asset(path):
     data = path.read_bytes()
     errors = []
+    if path.suffix == '.svg':
+        errors.extend(scan_svg(path, data))
     if path.suffix == '.webp':
         if len(data) > 500_000:
             errors.append('graphic exceeds 500 KB size budget: '+path.name)
         if b'EXIF' in data or b'XMP ' in data:
             errors.append('image contains metadata chunk requiring review: '+path.name)
+    if path.suffix == '.css':
+        source = data.decode('utf-8')
+        if re.search(r"@import\b|url\s*\(\s*['\"]?(?:https?:|//|data:|javascript:)|expression\s*\(", source, re.IGNORECASE):
+            errors.append('unsafe CSS import, remote reference or expression: '+path.name)
     if path.suffix == '.js':
         source = data.decode('utf-8')
         if re.search(r'\b(?:eval|Function)\s*\(', source):
@@ -173,9 +214,9 @@ def audit(dist=DIST):
     if not assets.is_dir():
         errors.append('assets directory missing')
     else:
-        for path in assets.iterdir():
+        for path in assets.rglob('*'):
             if path.is_file():
-                errors.extend(scan_asset(path))
+                errors.extend(f'{path.relative_to(dist)}: {error}' for error in scan_asset(path))
     cname = dist/'CNAME'
     if not cname.is_file() or cname.read_text(encoding='utf-8').strip() != 'weijdensecurity.nl':
         errors.append('missing/incorrect CNAME')
@@ -186,5 +227,5 @@ if __name__ == '__main__':
     found = audit()
     if found:
         sys.exit('SECURITY PREFLIGHT FAILED:\n - '+'\n - '.join(found))
-    print('Security preflight passed: CSP, safe navigation, resource policy, metadata and asset checks.')
+    print('Security preflight passed: CSP, safe navigation, nested SVG/asset policy, metadata and privacy checks.')
     print('LIMITATION: verify live HTTPS, response headers, accessibility and original source privacy separately.')

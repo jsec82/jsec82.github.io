@@ -1,0 +1,6 @@
+# Generated Python artifacts should never be published or reviewed as source.
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+.DS_Store

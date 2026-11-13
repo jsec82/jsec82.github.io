@@ -34,6 +34,7 @@ required={'index.html','projects/index.html','focus/index.html','roadmap/index.h
 projects=json.loads((ROOT/'content/projects.json').read_text(encoding='utf-8'))
 required|={'projects/'+p['slug']+'.html' for p in projects}
 required|={'en/'+rel for rel in required if rel not in ('about/index.html','skills/index.html','activity/index.html')}
+required|={prefix+'projects/engineering/'+route for prefix in ('','en/') for route in ('index.html','endpoint.html','identity.html','capstone.html')}
 for rel in required:
     if (DIST/rel).resolve() not in pages:errors.append('missing route: '+rel)
 if len(pages)!=len(required):errors.append('Unexpected HTML count')
