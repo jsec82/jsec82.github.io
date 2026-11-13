@@ -37,6 +37,16 @@ The homepage presents a clear learning journey, four Microsoft Core Focus Areas,
 - See [SEO review and follow-up](./SEO-REVIEW-2026-11-13.md). Verify indexing and search visibility with Google Search Console, Bing Webmaster Tools and actual search results. No rankings or AI citations are guaranteed.
 - Homepage design alternatives are **not** part of this SEO release; visual changes require separate selection and review.
 
+## Website V3.3 — theme, homepage hierarchy and evidence methodology (13 November 2026)
+
+- Approved template integration: calm homepage structure, counter strip and duplicate bottom progress section removed; three CTF/Case/Lab work categories and four Microsoft focus areas retained.
+- Persistent, visitor-controlled **dark/light theme** beside the existing NL/EN switch on all primary portfolio routes, without analytics, external runtime, or inline scripts.
+- New NL/EN [Learning and Evidence Methodology](./site-src/pages/methodology/index.html.tmpl) pages: the Academy V2.1 learning cycle, practical evidence criteria, accurate reported-versus-verified-versus-planned statuses and authoritative NIST NICE, NIST CSF 2.0, Microsoft Zero Trust and MITRE ATT&CK references. NICE Components version 2.2.0 is dated April 28, 2026.
+- The public portfolio data in `content/`, the user-observed MD-102 evidence limitations, all four existing case records and the three HSE planned flagships were not modified.
+- Validation includes the existing content/security/build checks and new bilingual theme/methodology regression tests. Current theme persistence uses browser-local storage; it does not send visitor data.
+- Legacy About, Skills and Activity compatibility URLs remain available. The original pre-change `main` commit `d1d1a23282d0a0a70d199ee0b6022204974afae6` remains the rollback baseline. Do not force-push main.
+- Publication requires a successful PR validation, deliberate merge approval and post-deployment Pages run verification. GitHub Pages is known to deploy on main updates.
+
 ## Local tests
 ```bash
 python scripts/validate.py
