@@ -22,12 +22,20 @@ The homepage presents a clear learning journey, four Microsoft Core Focus Areas,
 - Static automated security validation is not a penetration test or substitute for live HTTPS/header checks.
 
 
-## Hands-on Engineering preview and security review — 13 November 2026
+## Hands-on Engineering release and security review — 13 November 2026
 
-- The bilingual [Hands-on Security Engineering project section](./site-src/pages/projects/engineering/index.html.tmpl) is prepared **only on a review branch** with three planned flagships, dedicated NL/EN detail pages and homepage/Projects/Roadmap navigation.
+- The bilingual [Hands-on Security Engineering project section](./site-src/pages/projects/engineering/index.html.tmpl) was released on 13 November 2026 through PR #4 with three planned flagships, dedicated NL/EN detail pages and homepage/Projects/Roadmap navigation.
 - The [security and release assessment](./SECURITY-REVIEW-2026-11-13.md) records verified static controls, added SVG/CSS negative tests, repository bytecode cleanup and unresolved hosting requirements.
-- **Do not merge this PR into main without separate publication authorization and a verified Pages publishing source.** History shows GitHub Pages builds following pushes to main. The manually triggered deployment workflow does not, by itself, prevent that.
-- The current preview is **not a live feature**, and passing CI is not a claim of fully verified TLS/headers, accessibility or vulnerability-free operation.
+- Release PR #4 has been merged and GitHub Pages deployed successfully. The current Pages setup publishes automatically following main updates; a manually dispatched deployment workflow by itself does not prevent that.
+- The engineering project pages are live. Passing CI is not a claim of fully verified TLS/headers, accessibility or vulnerability-free operation.
+
+## Technical search visibility (SEO), 13 November 2026
+
+- Improved page-specific Dutch and English titles and descriptions for home, focus, work, roadmap, contact and planned engineering project details. Visible content and evidence statuses are unchanged.
+- Added CSP-compatible, public-only `WebSite` microdata on the Dutch root homepage and `ProfilePage`/`Person` microdata on the public contact pages; no inline JavaScript, analytics or tracking added.
+- Explicitly permits `OAI-SearchBot` in robots.txt; existing public crawler allowance remains unchanged. This is not a training policy change.
+- See [SEO review and follow-up](./SEO-REVIEW-2026-11-13.md). Verify indexing and search visibility with Google Search Console, Bing Webmaster Tools and actual search results. No rankings or AI citations are guaranteed.
+- Homepage design alternatives are **not** part of this SEO release; visual changes require separate selection and review.
 
 ## Local tests
 ```bash
