@@ -125,7 +125,8 @@ def audit_markup(source, relative):
         errors.append('unexpected canonical URL')
     if inspector.og_url != [page]:
         errors.append('unexpected Open Graph URL')
-    if inspector.og_image != [DOMAIN+'/assets/hero-globe.webp']:
+    expected_og_image = DOMAIN + ('/assets/social-preview.png' if relative.as_posix() in ('index.html', 'en/index.html') else '/assets/hero-globe.webp')
+    if inspector.og_image != [expected_og_image]:
         errors.append('unexpected Open Graph image')
     if inspector.csp != [CSP]:
         errors.append('missing/modified strict Content Security Policy')
