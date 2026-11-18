@@ -1,5 +1,19 @@
 [
   {
+    "date": "2026-11-05",
+    "label": "Intune configuration conflicts investigated",
+    "detail": "Learner observed multiple non-Succeeded profiles and a configuration Conflict. Root cause and remediation remain unverified; triage paused without configuration changes.",
+    "category": "In progress",
+    "project_slug": "md102-autopilot-esp"
+  },
+  {
+    "date": "2026-11-04",
+    "label": "Intune compliance and configuration status observed",
+    "detail": "Learner observed recent device check-in, Compliant status, at least one compliance policy and Test profile Succeeded. Aggregate Error/Conflict remained unresolved; no independent enforcement validation.",
+    "category": "In progress",
+    "project_slug": "md102-autopilot-esp"
+  },
+  {
     "date": "2026-11-03",
     "label": "FakeBank introductory Purple Team case completed",
     "detail": "Guided browser and Dirb exercise completed; detection, authorization and validation controls designed but not implemented.",
