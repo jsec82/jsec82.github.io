@@ -57,12 +57,12 @@
     "title": "Windows Autopilot & Intune enrollment",
     "eyebrow": "CASE STUDY 002 · ENDPOINT MANAGEMENT",
     "status": "in-progress",
-    "date": "2026-11-03",
+    "date": "2026-11-05",
     "discipline": "Microsoft Intune / Windows Autopilot",
     "description": "A physical Windows 11 Autopilot lab investigating Microsoft Entra join, user sign-in and Intune management.",
     "approach": "Inspected Autopilot profile targeting, enrollment restrictions and ESP settings. Completed user-driven Windows setup, signed in with the selected lab account and verified local device trust and MDM indicators.",
-    "validation": "On 3 November 2026, the user observed AzureAdJoined = YES, DomainJoined = NO and AzureAdPrt = YES via dsregcmd. The Windows device appeared in Intune with Managed by = Microsoft Intune. These confirm Entra join, user SSO readiness and Intune MDM visibility. ESP completion has not been established.",
-    "outcome": "Core Microsoft Entra join and Intune MDM enrollment confirmed by user observation. Effective compliance and configuration policy outcomes, application enforcement and actual ESP result remain to be tested.",
+    "validation": "On 3 November 2026, the learner observed Microsoft Entra join, PRT availability and Intune MDM enrollment. On 4 November, the Intune device view showed a recent check-in, Compliant status, at least one compliance policy and the Test configuration profile as Succeeded. Aggregate configuration results also showed Error/Conflict. On 5 November, multiple non-Succeeded profiles and a configuration Conflict were observed; the underlying cause remains unverified. All results are learner-reported observations, not independent control-effectiveness validation.",
+    "outcome": "User-driven Autopilot setup, Entra join and Intune enrollment were observed. Compliance reporting and one successful configuration profile were observed, but other configuration conflicts remain unresolved. ESP completion, effective policy enforcement and security-control effectiveness have not been independently validated.",
     "learned": "Validate the device trust state, user PRT and MDM status separately. A reachable desktop alone is insufficient; policy application requires additional per-device verification.",
     "tools": [
       "Microsoft Intune",
@@ -73,8 +73,8 @@
     "color": "blue",
     "priority": 2,
     "card_approach": "Completed user-driven setup and checked dsregcmd plus the Intune device record.",
-    "card_validation": "Entra join, PRT and Intune MDM confirmed by user checks.",
-    "card_outcome": "ESP outcome and effective device policy status still open.",
+    "card_validation": "User-observed Entra join, PRT, MDM, compliance and Test profile success; other configuration conflicts unresolved.",
+    "card_outcome": "ESP and control effectiveness unverified; configuration conflicts require diagnosis.",
     "evidence_checks": [
       {
         "item": "Microsoft Entra join",
@@ -100,6 +100,21 @@
         "item": "Configuration and compliance",
         "result": "Effective policy results still pending",
         "state": "Unverified"
+      },
+      {
+        "item": "Intune compliance reporting",
+        "result": "4 November: recent check-in, Compliant and at least one compliance policy observed",
+        "state": "User-observed"
+      },
+      {
+        "item": "Test configuration profile",
+        "result": "4 November: Test profile reported Succeeded; enforcement not independently validated",
+        "state": "User-observed"
+      },
+      {
+        "item": "Other configuration profiles",
+        "result": "5 November: multiple non-Succeeded profiles and Conflict; root cause unresolved",
+        "state": "Unresolved"
       }
     ],
     "example_command": "dsregcmd /status"
