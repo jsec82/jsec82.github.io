@@ -74,8 +74,8 @@ for project in projects:
     if missing:
         errors.append(f'{slug}: missing keys {sorted(missing)}')
         continue
-    if not isinstance(project['image'], str) or not re.fullmatch(r'[a-z0-9-]+\.svg', project['image']):
-        errors.append(f'{slug}: image must be a local SVG filename')
+    if not isinstance(project['image'], str) or not (re.fullmatch(r'[a-z0-9-]+\.svg', project['image']) or (slug == 'advent-of-cyber-2026' and project['image'] == 'advent-of-cyber-2026.webp')):
+        errors.append(f'{slug}: image must be a local SVG filename or the approved AOC WebP')
     elif not (ROOT / 'assets' / project['image']).is_file():
         errors.append(f'{slug}: project image missing')
     else:
@@ -110,6 +110,11 @@ for event in log:
         if not isinstance(event.get(field), str) or not event[field].strip():
             errors.append(f'lab log: missing {field}')
 for name in project_images:
+    if name == 'advent-of-cyber-2026.webp':
+        data = (ROOT / 'assets' / name).read_bytes()
+        if len(data) > 500_000 or len(data) < 12 or data[:4] != b'RIFF' or data[8:12] != b'WEBP' or b'EXIF' in data or b'XMP ' in data:
+            errors.append(f'{name}: invalid WebP, size or metadata policy')
+        continue
     try:
         root = ET.parse(ROOT / 'assets' / name).getroot()
         if root.tag != '{http://www.w3.org/2000/svg}svg' or not root.get('viewBox'):
