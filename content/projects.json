@@ -191,5 +191,37 @@
       }
     ],
     "example_command": ""
+  },
+  {
+    "slug": "advent-of-cyber-2026",
+    "image": "detection-art-hd.svg",
+    "image_alt": "Abstract security monitoring illustration",
+    "visual_label": "PRACTICAL LEARNING",
+    "title": "TryHackMe — Advent of Cyber 2026",
+    "eyebrow": "AOC-2026",
+    "status": "roadmap",
+    "date": null,
+    "discipline": "Cybersecurity practical learning",
+    "description": "Planned 24-day learning track.",
+    "approach": "One authorized challenge each evening, followed by reflection.",
+    "validation": "Not started; 0/24 recorded.",
+    "outcome": "No results claimed.",
+    "learned": "Pending assessment.",
+    "tools": [
+      "None recorded yet"
+    ],
+    "color": "violet",
+    "priority": 5,
+    "card_approach": "Planned daily practice.",
+    "card_validation": "0/24 recorded complete.",
+    "card_outcome": "No evidence yet.",
+    "evidence_checks": [
+      {
+        "item": "Daily labs",
+        "result": "Not started",
+        "state": "Planned"
+      }
+    ],
+    "example_command": ""
   }
 ]
