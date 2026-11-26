@@ -1,8 +1,9 @@
-# This release process is effective ONLY after changing Settings > Pages >
-# Build and deployment > Source to GitHub Actions. If the source remains the
-# main branch, GitHub Pages publishes pushes regardless of this manual gate.
+# Requires Settings > Pages > Source: GitHub Actions.
+# Protected main and successful build checks gate automatic publication.
 name: Publish approved portfolio to GitHub Pages
 on:
+  push:
+    branches: [main]
   workflow_dispatch:
     inputs:
       approved_commit:
@@ -20,7 +21,8 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - name: Require explicit approval for exact commit
+      - name: Require explicit approval for manual release
+        if: github.event_name == 'workflow_dispatch'
         env:
           APPROVED_SHA: ${{ inputs.approved_commit }}
           ACTUAL_SHA: ${{ github.sha }}
@@ -57,6 +59,6 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
-      - name: Publish only exact approved commit
+      - name: Publish validated main commit
         id: deployment
         uses: actions/deploy-pages@d6db90164ac5ed86f2b6aed7e0febac5b3c0c03e # v4.0.5
